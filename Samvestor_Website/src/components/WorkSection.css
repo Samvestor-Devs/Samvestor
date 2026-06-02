@@ -1,0 +1,90 @@
+.work-section {
+  position: relative;
+  width: 100%;
+  background: #070b12;
+  padding: 0 0 80px;
+  overflow: hidden;
+  cursor: none;
+  /* hide native cursor inside the section */
+}
+
+.work-section__list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #333;
+}
+
+/* ---- custom circle cursor ---- */
+.work-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* small by default — off the cards */
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  /* see-through so the grayscale lens shows the content underneath */
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  /* never blocks hover on the cards */
+  z-index: 50;
+  opacity: 0;
+  /* filter applied to whatever sits under the circle (grayscale for now) */
+  backdrop-filter: invert(1);
+  -webkit-backdrop-filter: invert(1);
+  transition: opacity 0.25s ease, width 0.3s ease, height 0.3s ease;
+  will-change: transform;
+}
+
+.work-cursor.is-visible {
+  opacity: 1;
+}
+
+/* grows to the big 40x40 circle only while over an anchor */
+.work-cursor.is-large {
+  width: 40px;
+  height: 40px;
+}
+
+/* ---- Discover More button ---- */
+.work-section__cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.work-section__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  padding: 0 40px;
+  border-radius: 12px;
+  background: #c9a84c;
+  color: #fdfaf0;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.work-section__button:hover {
+  background: #d8b85a;
+  transform: translateY(-2px);
+}
+
+/* hide the custom cursor on touch / small screens where it makes no sense */
+@media (max-width: 900px) {
+
+  .work-section,
+  .work-section__button {
+    cursor: auto;
+  }
+
+  .work-cursor {
+    display: none;
+  }
+}

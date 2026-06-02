@@ -1,0 +1,5 @@
+.services {
+  position: relative;
+  width: 100%;
+  /* native cursor stays here — the custom circle belongs to WorkSection only */
+}

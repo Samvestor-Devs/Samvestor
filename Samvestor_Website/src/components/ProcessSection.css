@@ -1,0 +1,231 @@
+.process {
+  background: #070b12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  padding: 80px;
+}
+
+/* ---- header ---- */
+.process__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 596px;
+  text-align: center;
+}
+
+.process__eyebrow {
+  font-family: 'Sans Serif Collection', sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+  color: #c9a84c;
+}
+
+.process__title {
+  margin: 0;
+  font-family: 'Sans Serif Collection', sans-serif;
+  font-weight: 400;
+  font-size: 50px;
+  line-height: 60px;
+  color: #ffffff;
+}
+
+.process__intro {
+  margin: 0;
+  font-family: 'Sans Serif Collection', sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+  color: #ffffff;
+}
+
+/* ---- body: two columns ---- */
+.process__body {
+  display: flex;
+  /* stretch so the right column is as tall as the left one — this gives the
+     sticky image a full-height track to stay pinned along while the left
+     column scrolls */
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 64px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* ---- left column (track + steps) ---- */
+.process__left {
+  position: relative;
+  padding-left: 50px;
+  flex: 1 1 0;
+  max-width: 609px;
+}
+
+.process__track {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+}
+
+.process__track-line {
+  position: absolute;
+  left: 1px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 16px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.04)
+  );
+}
+
+/* the gold bar — its height is driven from JS so the tip sits at screen centre */
+.process__track-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 0;
+  border-radius: 16px;
+  background: #c9a84c;
+  box-shadow: 0 0 16px rgba(201, 168, 76, 0.5);
+}
+
+.process__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 100px;
+}
+
+.process__item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0.4;
+  transition: opacity 0.4s ease;
+}
+
+.process__item.is-active {
+  opacity: 1;
+}
+
+.process__item-title {
+  margin: 0;
+  font-family: 'Sans Serif Collection', sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 28px;
+  color: #ffffff;
+}
+
+.process__item-sub {
+  margin: 0;
+  font-family: 'Sans Serif Collection', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 26px;
+  color: #ffffff;
+}
+
+.process__item-body {
+  margin: 10px 0 0;
+  font-family: 'Sans Serif Collection', sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+  color: #ffffff;
+}
+
+/* ---- right column (sticky crossfading image) ---- */
+.process__media {
+  flex-shrink: 0;
+  width: 527px;
+  max-width: 45%;
+}
+
+.process__sticky {
+  position: sticky;
+  /* keeps the image vertically centred in the viewport while it's pinned */
+  top: max(24px, calc(50vh - 253px));
+  height: 506px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.process__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 0.7s ease, transform 1.2s ease;
+  pointer-events: none;
+}
+
+.process__img.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ---- CTA ---- */
+.process__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  border-radius: 20px;
+  background: #edf2f8;
+  color: #0b1d3a;
+  font-family: 'Sans Serif Collection', sans-serif;
+  font-size: 24px;
+  line-height: 28px;
+  text-decoration: none;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.process__cta:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* ---- responsive ---- */
+@media (max-width: 900px) {
+  .process {
+    padding: 48px 20px;
+  }
+  .process__title {
+    font-size: 34px;
+    line-height: 40px;
+  }
+  .process__body {
+    flex-direction: column;
+    gap: 32px;
+  }
+  .process__media {
+    width: 100%;
+    max-width: 100%;
+    order: -1; /* show the image above the steps on mobile */
+  }
+  .process__sticky {
+    position: relative;
+    top: 0;
+    height: 320px;
+  }
+  .process__list {
+    gap: 56px;
+  }
+  /* on mobile every step reads fully — no dimming */
+  .process__item {
+    opacity: 1;
+  }
+}
