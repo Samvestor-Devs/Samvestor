@@ -18,7 +18,7 @@ const PROJECTS = [
       'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1600&q=80',
   },
   {
-    index: '03',
+    index: '02',
     name: 'FMCG / Masala Brand',
     tags: 'Meta / FMCG / Creative Angles / Retargeting',
     year: '2024',
@@ -27,7 +27,7 @@ const PROJECTS = [
       'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=1600&q=80',
   },
   {
-    index: '04',
+    index: '03',
     name: 'Bedding & Home Comfort',
     tags: 'Meta / Creative Testing / Retargeting / CRO',
     year: '2024',
@@ -36,7 +36,7 @@ const PROJECTS = [
       'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1600&q=80',
   },
   {
-    index: '02',
+    index: '04',
     name: 'Footwear & Lifestyle',
     tags: 'Optimization / Funnels / Scaling / Google / Meta',
     year: '2024',

@@ -1,5 +1,10 @@
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import ServicePanel from './ServicePanel';
 import './ServicesSection.css';
+
+gsap.registerPlugin(ScrollTrigger);
 
 // Placeholder image (swap with your real per-service images).
 const PLACEHOLDER =
@@ -84,8 +89,65 @@ const SERVICES = [
 ];
 
 function ServicesSection() {
+  const sectionRef = useRef(null);
+
+  // 3D recede: as the NEXT panel scrolls up to the top 25% line, the current
+  // (underneath) panel tilts back / scales down in 3D, sinking into the stack.
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // desktop only — no 3D recede / dimming on phones (panels just stack)
+      const mm = gsap.matchMedia();
+      mm.add('(min-width: 901px)', () => {
+      const panels = gsap.utils.toArray('.panel', sectionRef.current);
+
+      panels.forEach((panel, i) => {
+        if (i === panels.length - 1) return; // last panel stays flat
+
+        const card = panel.querySelector('.panel__card');
+        const overlay = panel.querySelector('.panel__overlay');
+        if (!card) return;
+
+        // alternate the slight z-rotation so panels don't all lean the same way
+        const dir = i % 2 === 0 ? 1 : -1;
+
+        // animate the INNER card (not the sticky panel) so there's no pin/unpin
+        // jump; one timeline scrubbed across a full viewport of scroll = a
+        // smooth, continuous recede with the dimmer fading in alongside it.
+        const tl = gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: {
+            trigger: panel, // the sticky panel = stable measurement
+            start: 'top top', // when this panel reaches the top
+            end: () => '+=' + window.innerHeight, // over one full screen of scroll
+            scrub: 1, // 1s smoothing — eases toward the scroll position
+            invalidateOnRefresh: true,
+          },
+        });
+
+        tl.to(
+          card,
+          {
+            rotate: 2.0287 * dir, // z-rotation
+            rotateX: 18, // tilt back in 3D (elegant, stays within the clip)
+            scale: 0.9,
+            y: -28, // drift up slightly as it sinks back
+            force3D: true,
+          },
+          0
+        );
+
+        if (overlay) tl.to(overlay, { opacity: 0.55 }, 0);
+      });
+
+      ScrollTrigger.refresh();
+      }); // mm.add
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section className="services">
+    <section className="services" ref={sectionRef}>
       {SERVICES.map((service) => (
         <ServicePanel key={service.number} {...service} />
       ))}

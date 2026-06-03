@@ -7,8 +7,11 @@ import './ServicePanel.css';
  */
 function ServicePanel({ number, title, paragraphs, image, bg, accent }) {
   return (
-    <article className="panel" style={{ background: bg }}>
-      <div className="panel__inner">
+    <article className="panel">
+      {/* the inner card is what gets the 3D transform — keeping it off the
+          sticky element avoids the pin/unpin jump */}
+      <div className="panel__card" style={{ background: bg }}>
+        <div className="panel__inner">
         {/* heading row: big title + number */}
         <header className="panel__head">
           <h2 className="panel__title">
@@ -45,6 +48,9 @@ function ServicePanel({ number, title, paragraphs, image, bg, accent }) {
             />
           </div>
         </div>
+        </div>
+        {/* darkens as the card recedes — adds depth */}
+        <div className="panel__overlay" />
       </div>
     </article>
   );

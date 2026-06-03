@@ -1,0 +1,53 @@
+/* tall outer track — its height is the scroll distance for the word reveal */
+.about {
+  position: relative;
+  background: #070b12;
+  height: 300vh;
+}
+
+/* inner wrapper stays on screen while the track scrolls past */
+.about__sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 28px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.about__text {
+  max-width: 1220px;
+  margin: 0;
+  font-family: 'Sans Serif Collection', sans-serif;
+  font-weight: 400;
+  font-size: clamp(26px, 3.4vw, 50px);
+  line-height: 1.2;
+  color: #edf2f8;
+  text-align: left; /* override the template's inherited text-align: center */
+}
+
+/* keeps each word + its trailing space together for natural wrapping */
+.about__word-wrap {
+  display: inline;
+}
+
+.about__word {
+  display: inline-block;
+  will-change: transform;
+  /* hidden before JS runs so nothing flashes in its final spot on load;
+     GSAP makes it visible (off-screen) via immediateRender */
+  visibility: hidden;
+}
+
+@media (max-width: 900px) {
+  .about {
+    height: 260vh;
+  }
+  .about__sticky {
+    align-items: center;
+    padding: 0 20px;
+  }
+}

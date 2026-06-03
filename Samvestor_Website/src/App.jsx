@@ -5,16 +5,18 @@ import ServicesSection from './components/ServicesSection';
 import ProcessSection from './components/ProcessSection';
 import TeamSection from './components/TeamSection';
 import WhoSection from './components/WhoSection';
+import AboutSection from './components/AboutSection';
 
 function App() {
   return (
     <>
       <Navbar />
+      <AboutSection />
       <ProcessSection />
+      <WhoSection />
       <TeamSection />
       <WorkSection />
       <ServicesSection />
-      <WhoSection />
     </>
   );
 }
