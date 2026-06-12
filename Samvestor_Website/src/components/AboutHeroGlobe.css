@@ -1,0 +1,35 @@
+/* the visible globe — centred behind the wordmark */
+.ahero__globe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 92vmin;
+  height: 92vmin;
+  max-width: 1100px;
+  max-height: 1100px;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+  /* fades in once cobe starts drawing (set to 1 from JS) */
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+/* vignette-only overlay — clear over the globe, darker at the edges/bottom so
+   the wordmark and side text keep their contrast */
+.ahero--globe .ahero__overlay {
+  background: radial-gradient(
+    115% 115% at 50% 45%,
+    rgba(7, 11, 18, 0) 0%,
+    rgba(7, 11, 18, 0) 35%,
+    rgba(7, 11, 18, 0.4) 68%,
+    rgba(7, 11, 18, 0.82) 100%
+  );
+}
+
+@media (max-width: 900px) {
+  .ahero__globe {
+    width: 96vmin;
+    height: 96vmin;
+  }
+}

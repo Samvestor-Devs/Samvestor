@@ -1,71 +1,26 @@
 import { useEffect, useState } from 'react';
 import './Navbar.css';
+import logoWhite from '../assets/sv-logo-white.png';
 
 const navItems = [
-    {
-        id: 'home',
-        href: '#home',
-        label: 'Home',
-        // icon: (
-        //     <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-        //         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-        //         <polyline points="9,22 9,12 15,12 15,22"></polyline>
-        //     </svg>
-        // ),
-    },
-    {
-        id: 'about-us',
-        href: '#about-us',
-        label: 'About Us',
-        // icon: (
-        //     <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-        //         <circle cx="12" cy="12" r="10"></circle>
-        //         <line x1="12" y1="16" x2="12" y2="12"></line>
-        //         <line x1="12" y1="8" x2="12.01" y2="8"></line>
-        //     </svg>
-        // ),
-    },
-    {
-        id: 'services',
-        href: '#services',
-        label: 'Services',
-        // icon: (
-        //     <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-        //         <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-        //         <line x1="8" y1="21" x2="16" y2="21"></line>
-        //         <line x1="12" y1="17" x2="12" y2="21"></line>
-        //     </svg>
-        // ),
-    },
-    {
-        id: 'case-studies',
-        href: '#case-studies',
-        label: 'Case Studies',
-        // icon: (
-        //     <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-        //         <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-        //         <path d="M16 3h6v4"></path>
-        //         <path d="m22 7-10-4-10 4"></path>
-        //     </svg>
-        // ),
-    },
-    {
-        id: 'contact-us',
-        href: '#contact-us',
-        label: 'Contact Us',
-        // icon: (
-        //     <svg className="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-        //         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-        //         <polyline points="22,6 12,13 2,6"></polyline>
-        //     </svg>
-        // ),
-    },
+    { id: 'home', href: '#home', label: 'Home' },
+    { id: 'about-us', href: '#/about', label: 'About us' },
+    { id: 'services', href: '#services', label: 'Services' },
+    { id: 'careers', href: '#careers', label: 'Careers' },
+    { id: 'case-studies', href: '#case-studies', label: 'Case Studies' },
+    { id: 'contact-us', href: '#contact-us', label: 'Contact Us' },
 ];
 
 const ctaLink = {
-    href: '#cta',
-    label: 'Get Started',
+    href: '#book-a-call',
+    label: 'Book A Call',
 };
+
+const PhoneIcon = () => (
+    <svg className="cta-icon-svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M6.62 10.79c1.44 2.83 3.76 5.15 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.07 21 3 13.93 3 5.5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+    </svg>
+);
 
 function Navbar() {
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -116,6 +71,20 @@ function Navbar() {
 
         closeMobileMenu();
 
+        // route-level links (e.g. #/about) switch pages
+        if (href.startsWith('#/')) {
+            window.location.hash = href;
+            window.scrollTo(0, 0);
+            return;
+        }
+
+        // a normal section link — if we're on a sub-route, go back to the
+        // homepage first, then scroll to the section
+        if (window.location.hash.startsWith('#/')) {
+            window.location.hash = '';
+            return;
+        }
+
         const target = document.querySelector(href);
         if (target) {
             target.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -127,8 +96,7 @@ function Navbar() {
             <nav className={`navbar-container ${scrolled ? 'scrolled' : ''}`}>
                 <div className="navbar">
                     <a href="#home" className="navbar-brand" onClick={(event) => handleNavigationClick(event, '#home')}>
-                        <div className="logo-icon" aria-hidden="true"></div>
-                        <span className="brand-text">NeoNav</span>
+                        <img className="brand-logo" src={logoWhite} alt="SamVestor" />
                     </a>
 
                     <ul className="navbar-nav" id="navbarNav">
@@ -139,21 +107,22 @@ function Navbar() {
                                     className={`nav-link ${activeHref === item.href ? 'active' : ''}`}
                                     onClick={(event) => handleNavigationClick(event, item.href)}
                                 >
-                                    {item.icon}
                                     <span>{item.label}</span>
                                 </a>
                             </li>
                         ))}
-                        <li className="nav-item">
-                            <a
-                                href={ctaLink.href}
-                                className="cta-button"
-                                onClick={(event) => handleNavigationClick(event, ctaLink.href, true)}
-                            >
-                                {ctaLink.label}
-                            </a>
-                        </li>
                     </ul>
+
+                    <a
+                        href={ctaLink.href}
+                        className="cta-button"
+                        onClick={(event) => handleNavigationClick(event, ctaLink.href, true)}
+                    >
+                        <span className="cta-icon">
+                            <PhoneIcon />
+                        </span>
+                        <span className="cta-label">{ctaLink.label}</span>
+                    </a>
 
                     <button
                         className={`mobile-toggle ${mobileOpen ? 'active' : ''}`}
@@ -180,8 +149,7 @@ function Navbar() {
             <div className={`mobile-menu ${mobileOpen ? 'active' : ''}`} id="mobileMenu" aria-hidden={!mobileOpen}>
                 <div className="mobile-menu-header">
                     <a href="#home" className="mobile-menu-brand" onClick={(event) => handleNavigationClick(event, '#home')}>
-                        <div className="logo-icon" aria-hidden="true"></div>
-                        <span>NeoNav</span>
+                        <img className="brand-logo" src={logoWhite} alt="SamVestor" />
                     </a>
                     <button
                         className="mobile-menu-close"
@@ -202,7 +170,6 @@ function Navbar() {
                                 className={`mobile-menu-link ${activeHref === item.href ? 'active' : ''}`}
                                 onClick={(event) => handleNavigationClick(event, item.href)}
                             >
-                                <span className="mobile-menu-icon" aria-hidden="true">{item.icon}</span>
                                 <span>{item.label}</span>
                             </a>
                         </li>
@@ -212,10 +179,13 @@ function Navbar() {
                 <div className="mobile-cta">
                     <a
                         href={ctaLink.href}
-                        className="mobile-cta-button"
+                        className="cta-button mobile-cta-button"
                         onClick={(event) => handleNavigationClick(event, ctaLink.href, true)}
                     >
-                        {ctaLink.label}
+                        <span className="cta-icon">
+                            <PhoneIcon />
+                        </span>
+                        <span className="cta-label">{ctaLink.label}</span>
                     </a>
                 </div>
             </div>

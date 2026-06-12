@@ -27,11 +27,13 @@ function ServicePanel({ number, title, paragraphs, image, bg, accent }) {
         {/* content row: text column + image */}
         <div className="panel__body">
           <div className="panel__text">
-            {paragraphs.map((p, i) => (
-              <p key={i} className="panel__para">
-                {p}
-              </p>
-            ))}
+            <div className="panel__copy">
+              {paragraphs.map((p, i) => (
+                <p key={i} className="panel__para">
+                  {p}
+                </p>
+              ))}
+            </div>
             <a
               className={`panel__cta panel__cta--${accent}`}
               href="#"

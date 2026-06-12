@@ -1,13 +1,21 @@
+/* ============================================================
+   Service panel — styled EXACTLY to the Figma (desktop 153:956,
+   mobile 153:3201).
+
+   Fluid sizing: every size is  max(calc(size / REF * 100vw), floor)
+     - REF 1440 on desktop (>=901px), REF 390 on mobile (<=900px)
+     - it grows on bigger screens and shrinks on smaller ones
+     - `floor` is the fixed least value a size may shrink to
+       (body/button text floor at their px so they stay readable)
+   ============================================================ */
+
 /* ---- the stacking panel (sticky frame only — never transformed) ---- */
 .panel {
   position: sticky;
   top: 0;
   height: 100vh;
   width: 100%;
-  /* page colour shows around the receded card so the deck reads cleanly */
   background: #070b12;
-  /* perspective lives here so the inner card's rotateX gets real depth, and
-     overflow:hidden clips the tilted card to the viewport (no page overflow) */
   perspective: 1600px;
   overflow: hidden;
 }
@@ -17,10 +25,11 @@
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* top-align content (matches Figma's top-down card) */
   justify-content: center;
+  /* clear the fixed navbar so a pinned panel's title is never hidden behind it */
+  padding-top: 100px;
   transform-origin: center center;
-  /* GPU-compositing hints so the 3D recede stays buttery */
   will-change: transform;
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -38,20 +47,19 @@
 
 .panel__inner {
   width: 100%;
-  max-width: 1440px;
   margin: 0 auto;
-  padding: 48px 64px;
+  padding: max(calc(20 / 1440 * 100vw), 13px) max(calc(16 / 1440 * 100vw), 10px);
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: max(calc(32 / 1440 * 100vw), 20px);
 }
 
-/* ---- heading row ---- */
+/* ---- heading row: big title + number ---- */
 .panel__head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
+  gap: max(calc(24 / 1440 * 100vw), 15px);
 }
 
 .panel__title {
@@ -60,29 +68,33 @@
   flex-direction: column;
   font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: clamp(48px, 9vw, 152px);
-  line-height: 0.92;
-  letter-spacing: -0.05em;
+  font-size: max(calc(152 / 1440 * 100vw), 95px);
+  line-height: 0.906;
+  letter-spacing: -0.0746em;
   color: #ffffff;
+  word-break: break-word;
+  /* the small space the Figma heading box leaves below the title text,
+     independent of how many lines the title wraps to */
+  padding-bottom: max(calc(20 / 1440 * 100vw), 12px);
 }
 
 .panel__number {
   font-family: 'Inter', sans-serif;
   font-weight: 700;
-  font-size: clamp(48px, 9vw, 152px);
-  line-height: 1;
-  letter-spacing: -0.05em;
+  font-size: max(calc(151.3 / 1440 * 100vw), 95px);
+  line-height: 1.006;
+  letter-spacing: -0.083em;
   color: #ffffff;
   flex-shrink: 0;
 }
 
-/* ---- content row ---- */
+/* ---- content row: text column + image ---- */
 .panel__body {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: 48px;
-  padding-top: 24px;
+  gap: max(calc(12 / 1440 * 100vw), 8px);
+  padding-top: max(calc(13 / 1440 * 100vw), 8px);
   border-top: 1px solid #9d9d9d;
 }
 
@@ -90,62 +102,72 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end; /* button sits to the right, matching the design */
-  gap: 13px;
-  width: 767px;
-  max-width: 60%;
+  gap: max(calc(13 / 1440 * 100vw), 8px);
+  width: max(calc(767 / 1440 * 100vw), 479px);
+  flex-shrink: 0;
+}
+
+/* the two paragraphs read as one continuous block (no inter-paragraph gap),
+   with a trailing line of space below — matching the Figma text node */
+.panel__copy {
+  width: 100%;
+  padding-bottom: max(calc(22 / 1440 * 100vw), 14px);
 }
 
 .panel__para {
   margin: 0;
   width: 100%;
-  font-family: 'Sans Serif Collection', sans-serif;
-  font-size: 14px;
-  line-height: 22px;
-  color: #edf2f8;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: max(calc(14 / 1440 * 100vw), 14px);
+  line-height: 1.571;
+  color: #ffffff;
 }
 
-/* ---- Book A Call button ---- */
+/* ---- Book A Call button (desktop = FILLED) ---- */
 .panel__cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 13px 27px;
-  border-radius: 8px;
-  border: 1.5px solid;
+  padding: max(calc(13 / 1440 * 100vw), 8px) max(calc(27 / 1440 * 100vw), 17px);
+  border-radius: max(calc(8 / 1440 * 100vw), 5px);
+  border: 1.5px solid transparent;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
-  font-size: 15px;
-  line-height: 18px;
-  color: #fdfaf0;
+  font-size: max(calc(15 / 1440 * 100vw), 15px);
+  line-height: 1.2;
   text-decoration: none;
   white-space: nowrap;
   transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
 }
 
 .panel__cta--gold {
+  background: #c9a84c;
   border-color: #c9a84c;
+  color: #fdfaf0;
 }
 .panel__cta--gold:hover {
-  background: #c9a84c;
-  color: #0b1d3a;
+  background: #b8973f;
+  border-color: #b8973f;
   transform: translateY(-2px);
 }
 
 .panel__cta--white {
+  background: #ffffff;
   border-color: #ffffff;
+  color: #0b1d3a;
 }
 .panel__cta--white:hover {
-  background: #ffffff;
-  color: #0b1d3a;
+  background: #e6e6e6;
+  border-color: #e6e6e6;
   transform: translateY(-2px);
 }
 
 /* ---- image ---- */
 .panel__media {
-  width: 553px;
-  max-width: 40%;
+  width: max(calc(553.564 / 1440 * 100vw), 346px);
   aspect-ratio: 552.58 / 420.17;
-  border-radius: 12px;
+  border-radius: max(calc(12 / 1440 * 100vw), 7px);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -163,7 +185,9 @@
   transform: scale(1.06);
 }
 
-/* ---- responsive ---- */
+/* ============================================================
+   MOBILE  (<=900px)  — Figma 153:3201, REF 390, single column
+   ============================================================ */
 @media (max-width: 900px) {
   .panel {
     height: auto;
@@ -175,23 +199,84 @@
   .panel__card {
     position: relative;
     inset: auto;
+    padding-top: 0; /* panels aren't pinned on mobile — no navbar clearance needed */
     transform: none !important; /* no 3D recede on mobile */
   }
+
   .panel__inner {
-    padding: 40px 20px;
-    gap: 20px;
+    padding: max(calc(20 / 390 * 100vw), 16px);
+    gap: max(calc(32 / 390 * 100vw), 26px);
   }
+
+  .panel__head {
+    gap: max(calc(12 / 390 * 100vw), 10px);
+  }
+
+  .panel__copy {
+    padding-bottom: max(calc(22 / 390 * 100vw), 14px);
+  }
+  .panel__title {
+    font-size: max(calc(45.2 / 390 * 100vw), 37px);
+    line-height: 0.903;
+    letter-spacing: -0.0743em;
+    padding-bottom: 0; /* mobile heading hugs the title; gap comes from inner gap */
+  }
+  .panel__number {
+    font-size: max(calc(40.7 / 390 * 100vw), 33px);
+    line-height: 1.002;
+    letter-spacing: -0.0826em;
+  }
+
   .panel__body {
     flex-direction: column;
     align-items: stretch;
-    gap: 24px;
+    gap: max(calc(20 / 390 * 100vw), 16px);
+    padding-top: max(calc(20 / 390 * 100vw), 16px);
   }
-  .panel__text,
+
+  /* text column: centered block, left-aligned copy, centered button */
+  .panel__text {
+    width: 100%;
+    align-items: center;
+    gap: max(calc(14 / 390 * 100vw), 11px);
+  }
+  .panel__para {
+    font-size: max(calc(14 / 390 * 100vw), 14px);
+    line-height: 1.571;
+    text-align: left;
+  }
+
+  /* button on mobile = OUTLINE */
+  .panel__cta {
+    padding: max(calc(13 / 390 * 100vw), 11px) max(calc(27 / 390 * 100vw), 22px);
+    border-radius: max(calc(8 / 390 * 100vw), 7px);
+    font-size: max(calc(16 / 390 * 100vw), 16px);
+    line-height: 1.625;
+  }
+  .panel__cta--gold {
+    background: transparent;
+    border-color: #c9a84c;
+    color: #fdfaf0;
+  }
+  .panel__cta--gold:hover {
+    background: #c9a84c;
+    color: #0b1d3a;
+  }
+  .panel__cta--white {
+    background: transparent;
+    border-color: #ffffff;
+    color: #ffffff;
+  }
+  .panel__cta--white:hover {
+    background: #ffffff;
+    color: #0b1d3a;
+  }
+
+  /* image: full-width, mobile aspect ratio */
   .panel__media {
     width: 100%;
     max-width: 100%;
-  }
-  .panel__text {
-    align-items: flex-start;
+    aspect-ratio: 349.97 / 238.69;
+    border-radius: max(calc(12 / 390 * 100vw), 11px);
   }
 }
