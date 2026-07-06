@@ -19,6 +19,10 @@ function WorkCard({ index, name, tags, year, link, image }) {
   const [tagText, setTagText] = useState(tags);
   const frameRef = useRef(0);
   const rafRef = useRef(null);
+  const cardRef = useRef(null);
+  // mobile has no hover — a card becomes "active" (same visual as hover)
+  // while it passes through the middle band of the viewport
+  const [active, setActive] = useState(false);
 
   // keep the visible tags in sync if the prop ever changes
   useEffect(() => {
@@ -64,9 +68,52 @@ function WorkCard({ index, name, tags, year, link, image }) {
     setTagText(tags);
   };
 
+  // mobile: drive the hover effect from scroll position instead — the card
+  // activates while its box overlaps the middle 30% of the viewport
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 900px)');
+    let observer = null;
+
+    const attach = () => {
+      if (observer || !cardRef.current) return;
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          setActive(entry.isIntersecting);
+          if (entry.isIntersecting) {
+            scramble();
+          } else {
+            reset();
+          }
+        },
+        { rootMargin: '-35% 0px -35% 0px' }
+      );
+      observer.observe(cardRef.current);
+    };
+
+    const detach = () => {
+      if (observer) {
+        observer.disconnect();
+        observer = null;
+      }
+      setActive(false);
+    };
+
+    const onChange = () => (mq.matches ? attach() : detach());
+    onChange();
+    mq.addEventListener('change', onChange);
+
+    return () => {
+      mq.removeEventListener('change', onChange);
+      detach();
+    };
+    // scramble/reset are stable per `tags`; re-attach if the tags change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tags]);
+
   return (
     <a
-      className="work-card"
+      ref={cardRef}
+      className={`work-card ${active ? 'is-active' : ''}`}
       href={link}
       onMouseEnter={scramble}
       onMouseLeave={reset}

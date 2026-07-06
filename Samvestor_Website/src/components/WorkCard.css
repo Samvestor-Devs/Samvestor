@@ -48,12 +48,16 @@
   background: rgba(7, 11, 18, 0.45);
 }
 
-.work-card:hover .work-card__image {
+/* .is-active mirrors :hover — set from JS while the card crosses the
+   middle of the viewport on mobile (no hover there) */
+.work-card:hover .work-card__image,
+.work-card.is-active .work-card__image {
   opacity: 1;
   transform: scale(1);
 }
 
-.work-card:hover .work-card__veil {
+.work-card:hover .work-card__veil,
+.work-card.is-active .work-card__veil {
   opacity: 0.6;
 }
 
@@ -93,11 +97,13 @@
   transition: transform 0.5s ease;
 }
 
-.work-card:hover .work-card__name {
+.work-card:hover .work-card__name,
+.work-card.is-active .work-card__name {
   transform: translateX(16px);
 }
 
-.work-card:hover .work-card__index {
+.work-card:hover .work-card__index,
+.work-card.is-active .work-card__index {
   color: var(--gold);
 }
 
@@ -126,26 +132,43 @@
   color: #676767;
 }
 
-.work-card:hover .work-card__tags {
+.work-card:hover .work-card__tags,
+.work-card.is-active .work-card__tags {
   color: var(--off-white);
 }
 
-/* ---- mobile (--fx base is 390) ---- */
+/* ---- mobile (--fx base is 390) — Figma 153:3010: stacked rows,
+   index on top, big two-line title, tags + year below ---- */
 @media (max-width: 900px) {
   .work-card {
-    height: calc(150 * var(--fx));
+    height: auto;
+    cursor: auto;
   }
   .work-card__inner {
-    padding: 0 calc(24 * var(--fx));
-  }
-  .work-card__name {
-    font-size: max(calc(34 * var(--fx)), 28px);
-    line-height: 1.176;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+    padding: calc(19.5 * var(--fx)) calc(15.6 * var(--fx)) calc(24 * var(--fx));
+    gap: calc(11.68 * var(--fx));
   }
   .work-card__left {
-    gap: calc(18 * var(--fx));
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(35 * var(--fx));
+  }
+  .work-card__name {
+    font-size: max(calc(50 * var(--fx)), 34px);
+    line-height: 1.2;
+    white-space: normal;
   }
   .work-card__right {
-    display: none;
+    align-items: flex-start;
+    text-align: left;
+    gap: calc(19.5 * var(--fx));
+  }
+  .work-card__tags,
+  .work-card__year {
+    color: #8f8c8c;
   }
 }

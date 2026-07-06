@@ -84,8 +84,36 @@
   flex-direction: column;
   justify-content: space-between;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
-  /* hidden until GSAP reveals it (avoids a flash before the trigger fires) */
-  visibility: hidden;
+}
+
+/* hidden until GSAP reveals it (avoids a flash before the trigger fires) —
+   desktop only, so the mobile stack can never end up invisible */
+@media (min-width: 901px) {
+  .who__card {
+    visibility: hidden;
+  }
+}
+
+/* desktop fan anchors + colors — GSAP centres each card on its anchor point */
+.who__card--creative {
+  left: calc(50% - 128px);
+  top: 50%;
+  z-index: 1;
+  background: #e2c87a;
+}
+
+.who__card--scaling {
+  left: calc(50% + 128px);
+  top: 50%;
+  z-index: 2;
+  background: #d4b86a;
+}
+
+.who__card--ambitious {
+  left: 50%;
+  top: calc(50% - 32px);
+  z-index: 3;
+  background: var(--gold-light);
 }
 
 .who__card-title {
@@ -110,10 +138,7 @@
 }
 
 /* ---- responsive ---- */
-@media (max-width: 1100px) {
-  .who {
-    padding: 64px 24px;
-  }
+@media (min-width: 901px) and (max-width: 1100px) {
   /* scale the whole fan down so it still fits; GSAP transforms stay intact */
   .who__stage {
     transform: scale(0.7);
@@ -122,19 +147,111 @@
   }
 }
 
+/* ============================================================
+   MOBILE (<=900px) — Figma 153:2892: normal flow header, then
+   full-width gold cards that pin (sticky) and stack over each
+   other while scrolling. The GSAP fan is disabled here.
+   ============================================================ */
 @media (max-width: 900px) {
-  .who__title {
-    font-size: max(calc(52 * var(--fx)), 44px);
+  .who {
+    height: auto;
+    padding: calc(16 * var(--fx));
   }
-}
 
-@media (max-width: 640px) {
-  .who__stage {
-    transform: scale(0.5);
-    margin-top: -200px;
-    margin-bottom: -200px;
+  .who__sticky {
+    position: static;
+    height: auto;
+    padding: 0;
+    overflow: visible;
+    justify-content: flex-start;
   }
+
+  .who__head {
+    gap: calc(15 * var(--fx));
+    padding-bottom: calc(16 * var(--fx));
+  }
+
   .who__badge {
-    font-size: 13px;
+    padding: calc(7 * var(--fx)) calc(8 * var(--fx)) calc(8 * var(--fx));
+    font-size: max(calc(16 * var(--fx)), 12px);
+    line-height: 1.625;
+  }
+
+  .who__title {
+    font-size: max(calc(50 * var(--fx)), 40px);
+    line-height: 1.2;
+    text-transform: none;
+  }
+
+  .who__tag {
+    font-family: var(--font-display);
+    color: var(--white);
+    font-size: max(calc(24 * var(--fx)), 18px);
+    line-height: 1.167;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .who__stage {
+    height: auto;
+    margin: 0;
+    transform: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(6 * var(--fx));
+  }
+
+  .who__card {
+    /* each card pins below the navbar and the next one covers it */
+    position: sticky;
+    top: 90px;
+    left: auto;
+    width: calc(326 * var(--fx));
+    height: auto;
+    min-height: calc(355 * var(--fx));
+    padding: calc(32 * var(--fx));
+    border-radius: 8px;
+    justify-content: flex-start;
+    gap: calc(30 * var(--fx));
+  }
+
+  /* stack order + colors per the mobile design (light -> dark gold);
+     later cards must paint on top for the cover effect */
+  .who__card--ambitious {
+    order: 1;
+    z-index: 1;
+    transform: rotate(-1deg);
+    background: var(--gold-light);
+  }
+
+  .who__card--scaling {
+    order: 2;
+    z-index: 2;
+    transform: rotate(1deg);
+    background: #e2c87a;
+  }
+
+  .who__card--creative {
+    order: 3;
+    z-index: 3;
+    transform: rotate(-1deg);
+    background: #d4b86a;
+  }
+
+  .who__card-title {
+    width: 100%;
+    text-align: center;
+    font-size: max(calc(32 * var(--fx)), 26px);
+    line-height: 1;
+  }
+
+  .who__card-body {
+    width: 100%;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: max(calc(16 * var(--fx)), 14px);
+    line-height: 1.625;
+    color: #082620;
   }
 }

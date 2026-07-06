@@ -199,8 +199,10 @@
     height: auto;
     aspect-ratio: auto; /* mobile cards grow with their content */
     min-height: auto;
-    position: relative; /* stop pinning on small screens */
-    top: auto;
+    /* keep the stack-over scroll on mobile too (no 3D recede — the next
+       card simply slides up and covers the pinned one) */
+    position: sticky;
+    top: 0;
     perspective: none;
     overflow: visible;
   }
@@ -226,6 +228,7 @@
     font-size: max(calc(45.2 / 390 * 100cqw), 37px);
     line-height: 0.903;
     letter-spacing: -0.0743em;
+    text-align: left;
     padding-bottom: 0; /* mobile heading hugs the title; gap comes from inner gap */
   }
   .panel__number {
