@@ -142,3 +142,6 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 "_ff/ffmpeg.exe" 
+
+# local ffmpeg download
+_ff/

@@ -1,8 +1,8 @@
 .work-section {
   position: relative;
   width: 100%;
-  background: #070b12;
-  padding: 0 0 80px;
+  background: var(--canvas);
+  padding: 0 0 calc(80 * var(--fx));
   overflow: hidden;
   cursor: none;
   /* hide native cursor inside the section */
@@ -14,7 +14,7 @@
   border-top: 1px solid #333;
 }
 
-/* ---- custom circle cursor ---- */
+/* ---- custom circle cursor (fixed px — a cursor shouldn't scale) ---- */
 .work-cursor {
   position: absolute;
   top: 0;
@@ -51,20 +51,20 @@
 .work-section__cta {
   display: flex;
   justify-content: center;
-  margin-top: 40px;
+  margin-top: calc(40 * var(--fx));
 }
 
 .work-section__button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 60px;
-  padding: 0 40px;
-  border-radius: 12px;
-  background: #c9a84c;
-  color: #fdfaf0;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  height: calc(60 * var(--fx));
+  padding: 0 calc(40 * var(--fx));
+  border-radius: calc(12 * var(--fx));
+  background: var(--gold);
+  color: var(--off-white);
+  font-family: var(--font-body);
+  font-size: max(calc(14 * var(--fx)), 13px);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   text-decoration: none;
@@ -82,6 +82,10 @@
   .work-section,
   .work-section__button {
     cursor: auto;
+  }
+
+  .work-section__button {
+    height: calc(52 * var(--fx));
   }
 
   .work-cursor {

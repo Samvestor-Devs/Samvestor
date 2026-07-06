@@ -1,0 +1,223 @@
+/* Footer — Figma desktop 148:480, mobile 153:3354.
+   All sizes are Figma px made fluid via --fx. */
+.footer {
+    background: var(--canvas);
+    overflow: hidden;
+    text-align: left;
+}
+
+/* ---- Top area ---- */
+.footer__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: calc(60 * var(--fx));
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: calc(24 * var(--fx)) calc(60 * var(--fx)) calc(124 * var(--fx));
+    box-sizing: border-box;
+}
+
+/* ---- Brand / tagline ---- */
+.footer__tagline {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    color: var(--primary-50);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: max(calc(50 * var(--fx)), 32px);
+    line-height: 1.2;
+}
+
+/* gold → white → blue sweep, Figma radial approximated linearly */
+.footer__tagline-gradient {
+    background: linear-gradient(
+        90deg,
+        #77581f 0%,
+        var(--gold) 20%,
+        #e4d4a6 38%,
+        var(--white) 50%,
+        #a5b7d2 63%,
+        var(--navy-300) 80%,
+        #1b3255 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.footer__sub {
+    margin: calc(8 * var(--fx)) 0 0;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: var(--font-body);
+    font-size: max(calc(18 * var(--fx)), 14px);
+    line-height: 1.2;
+}
+
+/* ---- Link columns ---- */
+.footer__columns {
+    display: flex;
+    gap: calc(60 * var(--fx));
+    flex-shrink: 0;
+}
+
+.footer__col-title {
+    margin: 0 0 calc(10 * var(--fx));
+    color: var(--cream);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: max(calc(24 * var(--fx)), 18px);
+    line-height: 1.167;
+}
+
+.footer__list {
+    display: flex;
+    flex-direction: column;
+    gap: calc(10 * var(--fx));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.footer__link {
+    color: var(--cream-dim);
+    font-family: var(--font-display);
+    font-size: max(calc(16 * var(--fx)), 14px);
+    line-height: 1.625;
+    text-decoration: none;
+    transition: color 0.25s ease;
+}
+
+a.footer__link:hover {
+    color: var(--cream);
+}
+
+/* ---- Contact rows ---- */
+.footer__list--contact {
+    gap: calc(8 * var(--fx));
+}
+
+.footer__contact-row {
+    display: flex;
+    align-items: center;
+    gap: calc(6 * var(--fx));
+}
+
+.footer__contact-row--address {
+    align-items: flex-start;
+}
+
+.footer__icon {
+    width: max(calc(24 * var(--fx)), 18px);
+    height: max(calc(24 * var(--fx)), 18px);
+    flex-shrink: 0;
+    color: var(--cream-dim);
+}
+
+.footer__icon--pin {
+    width: max(calc(20 * var(--fx)), 16px);
+    height: max(calc(20 * var(--fx)), 16px);
+    margin-top: 3px;
+}
+
+/* ---- Socials ---- */
+.footer__socials {
+    display: flex;
+    gap: calc(8 * var(--fx));
+    margin-top: calc(12 * var(--fx));
+    padding: 0 calc(6 * var(--fx));
+}
+
+.footer__social {
+    display: block;
+    width: max(calc(24 * var(--fx)), 20px);
+    height: max(calc(24 * var(--fx)), 20px);
+    color: #807971;
+    transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.footer__social svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.footer__social:hover {
+    color: var(--cream);
+    transform: translateY(-2px);
+}
+
+/* ---- Giant embossed wordmark (pure CSS/SVG, no image) ---- */
+.footer__wordmark {
+    max-width: 1440px;
+    margin: 0 auto;
+    line-height: 0;
+    /* letters sink into the page bottom like the Figma mask */
+    -webkit-mask-image: linear-gradient(180deg, #000 55%, rgba(0, 0, 0, 0.35) 100%);
+    mask-image: linear-gradient(180deg, #000 55%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+.footer__wordmark svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.footer__wordmark-text {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 245px; /* scales with the SVG viewBox — already fluid */
+    letter-spacing: 2px;
+    paint-order: stroke fill;
+}
+
+/* ---- Mobile — Figma 390 frame: extrabold uppercase centered tagline ---- */
+@media (max-width: 900px) {
+    .footer__top {
+        flex-direction: column;
+        gap: calc(37 * var(--fx));
+        padding: calc(16 * var(--fx)) calc(20 * var(--fx)) calc(40 * var(--fx));
+    }
+
+    .footer__tagline {
+        width: 100%;
+        text-align: center;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: max(calc(43 * var(--fx)), 34px);
+        line-height: 0.93;
+        gap: calc(8 * var(--fx));
+        font-family: var(--font-body);
+    }
+
+    .footer__tagline-gradient {
+        font-size: max(calc(32 * var(--fx)), 26px);
+    }
+
+    .footer__sub {
+        color: var(--white);
+        font-size: max(calc(16 * var(--fx)), 14px);
+        line-height: 1.625;
+        margin-top: calc(4 * var(--fx));
+    }
+
+    .footer__columns {
+        flex-direction: column;
+        gap: calc(24 * var(--fx));
+    }
+
+    .footer__col-title {
+        font-size: max(calc(16 * var(--fx)), 15px);
+        line-height: 1.625;
+    }
+
+    .footer__link {
+        font-size: max(calc(14 * var(--fx)), 13px);
+        line-height: 1.571;
+    }
+
+    .footer__contact-row {
+        gap: calc(8 * var(--fx));
+    }
+}

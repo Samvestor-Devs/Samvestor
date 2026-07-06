@@ -1,3 +1,44 @@
+/* ============================================================
+   Samvestor design tokens
+   ------------------------------------------------------------
+   --fx is "one Figma pixel": sizes written as calc(N * var(--fx))
+   render at exactly N px on the reference frame (1440 desktop,
+   390 mobile) and scale fluidly on every other screen width.
+   Body-size text should keep a readable floor:
+   max(calc(N * var(--fx)), Npx).
+   ============================================================ */
+:root {
+  /* colors */
+  --canvas: #070b12; /* page / section background */
+  --navy-900: #0b1d3a;
+  --navy-700: #1a2f52;
+  --navy-500: #243d66;
+  --navy-300: #4a6fa5;
+  --gold: #c9a84c;
+  --gold-dark: #b8973f;
+  --gold-light: #eed9a0;
+  --cream: #fff3e2; /* footer headings */
+  --cream-dim: rgba(255, 243, 226, 0.5); /* footer links */
+  --off-white: #fdfaf0; /* button labels on gold */
+  --primary-50: #edf2f8; /* main light text */
+  --white: #ffffff;
+
+  /* type */
+  --font-display: 'Sans Serif Collection', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  /* fluid scale — desktop Figma frame is 1440 wide */
+  --fx: calc(100vw / 1440);
+}
+
+/* mobile Figma frame is 390 wide (kept in sync with the sections'
+   900px layout breakpoint) */
+@media (max-width: 900px) {
+  :root {
+    --fx: calc(100vw / 390);
+  }
+}
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;

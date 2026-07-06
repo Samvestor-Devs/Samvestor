@@ -117,8 +117,17 @@ function ServicesSection() {
           defaults: { ease: 'none' },
           scrollTrigger: {
             trigger: panel, // the sticky panel = stable measurement
-            start: 'top top', // when this panel reaches the top
-            end: () => '+=' + window.innerHeight, // over one full screen of scroll
+            // when this panel pins (matches the CSS sticky top: 0 on tall
+            // screens, bottom-aligned negative offset on wide screens)
+            start: () =>
+              'top ' +
+              Math.min(
+                0,
+                window.innerHeight -
+                  document.documentElement.clientWidth * (800 / 1440)
+              ) +
+              'px',
+            end: () => '+=' + panel.offsetHeight, // until the next card fully covers it
             scrub: 1, // 1s smoothing — eases toward the scroll position
             invalidateOnRefresh: true,
           },

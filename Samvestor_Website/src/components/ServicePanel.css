@@ -1,8 +1,8 @@
-/* ============================================================
+﻿/* ============================================================
    Service panel — styled EXACTLY to the Figma (desktop 153:956,
    mobile 153:3201).
 
-   Fluid sizing: every size is  max(calc(size / REF * 100vw), floor)
+   Fluid sizing: every size is  max(calc(size / REF * 100cqw), floor)
      - REF 1440 on desktop (>=901px), REF 390 on mobile (<=900px)
      - it grows on bigger screens and shrinks on smaller ones
      - `floor` is the fixed least value a size may shrink to
@@ -12,10 +12,18 @@
 /* ---- the stacking panel (sticky frame only — never transformed) ---- */
 .panel {
   position: sticky;
-  top: 0;
-  height: 100vh;
+  /* pin at the top of the screen — except when the full-width 1440:800 card
+     is taller than the viewport (very wide screens): then pin by the BOTTOM
+     edge (negative top) so the image and the space below it are fully
+     visible before the next card overlaps. Keep in sync with the
+     ScrollTrigger start in ServicesSection.jsx */
+  top: min(0px, calc(100vh - (100cqw * (800 / 1440))));
+  /* fluid full-bleed card: always the Figma frame's 1440:800 proportions */
+  aspect-ratio: 1440 / 800;
   width: 100%;
-  background: #070b12;
+  /* children size themselves in cqw against the card, not the viewport */
+  container-type: inline-size;
+  background: var(--canvas);
   perspective: 1600px;
   overflow: hidden;
 }
@@ -27,8 +35,6 @@
   display: flex;
   align-items: flex-start; /* top-align content (matches Figma's top-down card) */
   justify-content: center;
-  /* clear the fixed navbar so a pinned panel's title is never hidden behind it */
-  padding-top: 100px;
   transform-origin: center center;
   will-change: transform;
   transform: translateZ(0);
@@ -48,10 +54,10 @@
 .panel__inner {
   width: 100%;
   margin: 0 auto;
-  padding: max(calc(20 / 1440 * 100vw), 13px) max(calc(16 / 1440 * 100vw), 10px);
+  padding: max(calc(20 / 1440 * 100cqw), 13px) max(calc(16 / 1440 * 100cqw), 10px);
   display: flex;
   flex-direction: column;
-  gap: max(calc(32 / 1440 * 100vw), 20px);
+  gap: max(calc(32 / 1440 * 100cqw), 20px);
 }
 
 /* ---- heading row: big title + number ---- */
@@ -59,32 +65,32 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: max(calc(24 / 1440 * 100vw), 15px);
+  gap: max(calc(24 / 1440 * 100cqw), 15px);
 }
 
 .panel__title {
   margin: 0;
   display: flex;
   flex-direction: column;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
-  font-size: max(calc(152 / 1440 * 100vw), 95px);
+  font-size: max(calc(152 / 1440 * 100cqw), 95px);
   line-height: 0.906;
   letter-spacing: -0.0746em;
-  color: #ffffff;
+  color: var(--white);
   word-break: break-word;
   /* the small space the Figma heading box leaves below the title text,
      independent of how many lines the title wraps to */
-  padding-bottom: max(calc(20 / 1440 * 100vw), 12px);
+  padding-bottom: max(calc(20 / 1440 * 100cqw), 12px);
 }
 
 .panel__number {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
-  font-size: max(calc(151.3 / 1440 * 100vw), 95px);
+  font-size: max(calc(151.3 / 1440 * 100cqw), 95px);
   line-height: 1.006;
   letter-spacing: -0.083em;
-  color: #ffffff;
+  color: var(--white);
   flex-shrink: 0;
 }
 
@@ -93,8 +99,8 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: max(calc(12 / 1440 * 100vw), 8px);
-  padding-top: max(calc(13 / 1440 * 100vw), 8px);
+  gap: max(calc(12 / 1440 * 100cqw), 8px);
+  padding-top: max(calc(13 / 1440 * 100cqw), 8px);
   border-top: 1px solid #9d9d9d;
 }
 
@@ -102,8 +108,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end; /* button sits to the right, matching the design */
-  gap: max(calc(13 / 1440 * 100vw), 8px);
-  width: max(calc(767 / 1440 * 100vw), 479px);
+  gap: max(calc(13 / 1440 * 100cqw), 8px);
+  width: max(calc(767 / 1440 * 100cqw), 479px);
   flex-shrink: 0;
 }
 
@@ -111,17 +117,17 @@
    with a trailing line of space below — matching the Figma text node */
 .panel__copy {
   width: 100%;
-  padding-bottom: max(calc(22 / 1440 * 100vw), 14px);
+  padding-bottom: max(calc(22 / 1440 * 100cqw), 14px);
 }
 
 .panel__para {
   margin: 0;
   width: 100%;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-weight: 400;
-  font-size: max(calc(14 / 1440 * 100vw), 14px);
+  font-size: max(calc(14 / 1440 * 100cqw), 14px);
   line-height: 1.571;
-  color: #ffffff;
+  color: var(--white);
 }
 
 /* ---- Book A Call button (desktop = FILLED) ---- */
@@ -129,12 +135,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: max(calc(13 / 1440 * 100vw), 8px) max(calc(27 / 1440 * 100vw), 17px);
-  border-radius: max(calc(8 / 1440 * 100vw), 5px);
+  padding: max(calc(13 / 1440 * 100cqw), 8px) max(calc(27 / 1440 * 100cqw), 17px);
+  border-radius: max(calc(8 / 1440 * 100cqw), 5px);
   border: 1.5px solid transparent;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-weight: 600;
-  font-size: max(calc(15 / 1440 * 100vw), 15px);
+  font-size: max(calc(15 / 1440 * 100cqw), 15px);
   line-height: 1.2;
   text-decoration: none;
   white-space: nowrap;
@@ -142,20 +148,20 @@
 }
 
 .panel__cta--gold {
-  background: #c9a84c;
-  border-color: #c9a84c;
-  color: #fdfaf0;
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--off-white);
 }
 .panel__cta--gold:hover {
-  background: #b8973f;
-  border-color: #b8973f;
+  background: var(--gold-dark);
+  border-color: var(--gold-dark);
   transform: translateY(-2px);
 }
 
 .panel__cta--white {
-  background: #ffffff;
-  border-color: #ffffff;
-  color: #0b1d3a;
+  background: var(--white);
+  border-color: var(--white);
+  color: var(--navy-900);
 }
 .panel__cta--white:hover {
   background: #e6e6e6;
@@ -165,9 +171,9 @@
 
 /* ---- image ---- */
 .panel__media {
-  width: max(calc(553.564 / 1440 * 100vw), 346px);
+  width: max(calc(553.564 / 1440 * 100cqw), 346px);
   aspect-ratio: 552.58 / 420.17;
-  border-radius: max(calc(12 / 1440 * 100vw), 7px);
+  border-radius: max(calc(12 / 1440 * 100cqw), 7px);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -191,38 +197,39 @@
 @media (max-width: 900px) {
   .panel {
     height: auto;
+    aspect-ratio: auto; /* mobile cards grow with their content */
     min-height: auto;
     position: relative; /* stop pinning on small screens */
+    top: auto;
     perspective: none;
     overflow: visible;
   }
   .panel__card {
     position: relative;
     inset: auto;
-    padding-top: 0; /* panels aren't pinned on mobile — no navbar clearance needed */
     transform: none !important; /* no 3D recede on mobile */
   }
 
   .panel__inner {
-    padding: max(calc(20 / 390 * 100vw), 16px);
-    gap: max(calc(32 / 390 * 100vw), 26px);
+    padding: max(calc(20 / 390 * 100cqw), 16px);
+    gap: max(calc(32 / 390 * 100cqw), 26px);
   }
 
   .panel__head {
-    gap: max(calc(12 / 390 * 100vw), 10px);
+    gap: max(calc(12 / 390 * 100cqw), 10px);
   }
 
   .panel__copy {
-    padding-bottom: max(calc(22 / 390 * 100vw), 14px);
+    padding-bottom: max(calc(22 / 390 * 100cqw), 14px);
   }
   .panel__title {
-    font-size: max(calc(45.2 / 390 * 100vw), 37px);
+    font-size: max(calc(45.2 / 390 * 100cqw), 37px);
     line-height: 0.903;
     letter-spacing: -0.0743em;
     padding-bottom: 0; /* mobile heading hugs the title; gap comes from inner gap */
   }
   .panel__number {
-    font-size: max(calc(40.7 / 390 * 100vw), 33px);
+    font-size: max(calc(40.7 / 390 * 100cqw), 33px);
     line-height: 1.002;
     letter-spacing: -0.0826em;
   }
@@ -230,46 +237,46 @@
   .panel__body {
     flex-direction: column;
     align-items: stretch;
-    gap: max(calc(20 / 390 * 100vw), 16px);
-    padding-top: max(calc(20 / 390 * 100vw), 16px);
+    gap: max(calc(20 / 390 * 100cqw), 16px);
+    padding-top: max(calc(20 / 390 * 100cqw), 16px);
   }
 
   /* text column: centered block, left-aligned copy, centered button */
   .panel__text {
     width: 100%;
     align-items: center;
-    gap: max(calc(14 / 390 * 100vw), 11px);
+    gap: max(calc(14 / 390 * 100cqw), 11px);
   }
   .panel__para {
-    font-size: max(calc(14 / 390 * 100vw), 14px);
+    font-size: max(calc(14 / 390 * 100cqw), 14px);
     line-height: 1.571;
     text-align: left;
   }
 
   /* button on mobile = OUTLINE */
   .panel__cta {
-    padding: max(calc(13 / 390 * 100vw), 11px) max(calc(27 / 390 * 100vw), 22px);
-    border-radius: max(calc(8 / 390 * 100vw), 7px);
-    font-size: max(calc(16 / 390 * 100vw), 16px);
+    padding: max(calc(13 / 390 * 100cqw), 11px) max(calc(27 / 390 * 100cqw), 22px);
+    border-radius: max(calc(8 / 390 * 100cqw), 7px);
+    font-size: max(calc(16 / 390 * 100cqw), 16px);
     line-height: 1.625;
   }
   .panel__cta--gold {
     background: transparent;
-    border-color: #c9a84c;
-    color: #fdfaf0;
+    border-color: var(--gold);
+    color: var(--off-white);
   }
   .panel__cta--gold:hover {
-    background: #c9a84c;
-    color: #0b1d3a;
+    background: var(--gold);
+    color: var(--navy-900);
   }
   .panel__cta--white {
     background: transparent;
-    border-color: #ffffff;
-    color: #ffffff;
+    border-color: var(--white);
+    color: var(--white);
   }
   .panel__cta--white:hover {
-    background: #ffffff;
-    color: #0b1d3a;
+    background: var(--white);
+    color: var(--navy-900);
   }
 
   /* image: full-width, mobile aspect ratio */
@@ -277,6 +284,6 @@
     width: 100%;
     max-width: 100%;
     aspect-ratio: 349.97 / 238.69;
-    border-radius: max(calc(12 / 390 * 100vw), 11px);
+    border-radius: max(calc(12 / 390 * 100cqw), 11px);
   }
 }

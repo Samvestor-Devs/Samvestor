@@ -1,7 +1,7 @@
 /* tall outer track — its height is the scroll distance for the word reveal */
 .about {
   position: relative;
-  background: #070b12;
+  background: var(--canvas);
   height: 300vh;
 }
 
@@ -13,19 +13,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 28px;
+  padding: 0 calc(28 * var(--fx));
   box-sizing: border-box;
   overflow: hidden;
 }
 
 .about__text {
-  max-width: 1220px;
+  max-width: calc(1220 * var(--fx));
   margin: 0;
-  font-family: 'Sans Serif Collection', sans-serif;
+  font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(26px, 3.4vw, 50px);
+  font-size: max(calc(50 * var(--fx)), 26px);
   line-height: 1.2;
-  color: #edf2f8;
+  color: var(--primary-50);
   text-align: left; /* override the template's inherited text-align: center */
 }
 
@@ -42,12 +42,17 @@
   visibility: hidden;
 }
 
+/* mobile (--fx base is 390) */
 @media (max-width: 900px) {
   .about {
     height: 260vh;
   }
   .about__sticky {
     align-items: center;
-    padding: 0 20px;
+    padding: 0 calc(20 * var(--fx));
+  }
+  .about__text {
+    max-width: 100%;
+    font-size: max(calc(26 * var(--fx)), 20px);
   }
 }

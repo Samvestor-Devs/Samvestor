@@ -1,0 +1,166 @@
+/* Hero — Figma: canvas, H1 100/110, body 24/28, gold CTA (desktop 148:47,
+   mobile 153:2772). All sizes are Figma px made fluid via --fx. */
+.hero {
+    position: relative;
+    min-height: 100svh;
+    background: var(--canvas);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    /* #root centers text globally — hero is left-aligned per the design */
+    text-align: left;
+}
+
+/* ---- Background video + readability overlay ---- */
+.hero__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(7, 11, 18, 0.72) 0%,
+        rgba(7, 11, 18, 0.55) 45%,
+        rgba(7, 11, 18, 0.82) 100%
+    );
+    z-index: 1;
+}
+
+/* ---- Content ---- */
+.hero__content {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: calc(150 * var(--fx)) calc(60 * var(--fx)) calc(30 * var(--fx));
+    box-sizing: border-box;
+}
+
+.hero__headline {
+    margin: 0;
+    color: var(--white);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: max(calc(100 * var(--fx)), 62px);
+    line-height: 1.1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    /* reserve two lines so the typewriter doesn't shift the layout */
+    min-height: 2.2em;
+}
+
+.hero__line {
+    display: block;
+    white-space: pre;
+    min-height: 1.1em;
+}
+
+/* ---- Typewriter cursor ---- */
+.hero__cursor {
+    display: inline-block;
+    width: max(calc(6 * var(--fx)), 3px);
+    height: 0.82em;
+    margin-left: 0.14em;
+    background: var(--gold);
+    vertical-align: baseline;
+    transform: translateY(0.08em);
+    animation: hero-cursor-blink 1.1s steps(2, start) infinite;
+}
+
+@keyframes hero-cursor-blink {
+    to {
+        visibility: hidden;
+    }
+}
+
+/* ---- Bottom row: CTA left, paragraph right ---- */
+.hero__bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: calc(40 * var(--fx));
+    width: 100%;
+}
+
+.hero__cta {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: calc(12 * var(--fx)) calc(18 * var(--fx));
+    background: var(--gold);
+    border-radius: calc(14 * var(--fx));
+    color: var(--primary-50);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: max(calc(17 * var(--fx)), 14px);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.hero__cta:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+}
+
+.hero__paragraph {
+    margin: 0;
+    max-width: calc(924 * var(--fx));
+    color: var(--white);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: max(calc(24 * var(--fx)), 16px);
+    line-height: 1.167;
+    text-align: right;
+}
+
+/* ---- Mobile — Figma 390 frame: H1 50/60, body 16/26, pill CTA ---- */
+@media (max-width: 900px) {
+    .hero__content {
+        padding: calc(120 * var(--fx)) calc(20 * var(--fx)) calc(40 * var(--fx));
+    }
+
+    .hero__headline {
+        font-size: max(calc(50 * var(--fx)), 40px);
+        line-height: 1.2;
+    }
+
+    .hero__line {
+        min-height: 1.2em;
+    }
+
+    .hero__cursor {
+        width: max(calc(4 * var(--fx)), 3px);
+    }
+
+    .hero__bottom {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: calc(36 * var(--fx));
+    }
+
+    .hero__cta {
+        padding: calc(12 * var(--fx)) calc(18 * var(--fx));
+        border-radius: 45px;
+        font-size: max(calc(16 * var(--fx)), 14px);
+        line-height: 1.2;
+    }
+
+    .hero__paragraph {
+        max-width: calc(350 * var(--fx));
+        font-size: max(calc(16 * var(--fx)), 14px);
+        line-height: 1.625;
+    }
+}

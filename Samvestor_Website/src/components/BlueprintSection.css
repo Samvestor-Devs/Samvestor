@@ -1,0 +1,194 @@
+/* Blueprint section — Figma desktop 148:453 + 148:472 (one section),
+   mobile 153:3333 + 153:3346. All sizes are Figma px made fluid via --fx. */
+.blueprint {
+    background: var(--canvas);
+    overflow: hidden;
+    text-align: left;
+}
+
+.blueprint__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(60 * var(--fx));
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: calc(20 * var(--fx)) calc(200 * var(--fx));
+    box-sizing: border-box;
+}
+
+/* ---- left column: pitch + button + image ---- */
+.blueprint__left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(19.5 * var(--fx));
+    width: calc(572 * var(--fx));
+    flex-shrink: 0;
+}
+
+.blueprint__pitch {
+    margin: 0;
+    color: var(--primary-50);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: max(calc(24 * var(--fx)), 16px);
+    line-height: 1.167;
+}
+
+.blueprint__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(61.5 * var(--fx));
+    padding: 0 calc(31 * var(--fx));
+    background: var(--gold);
+    border: 1px solid #1a9afc;
+    border-radius: calc(10 * var(--fx));
+    color: var(--white);
+    font-family: var(--font-display);
+    font-size: max(calc(24 * var(--fx)), 15px);
+    line-height: 1.167;
+    text-align: center;
+    text-decoration: none;
+    box-sizing: border-box;
+    transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.blueprint__cta:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+}
+
+/* opposite rounded corners, like the Figma container */
+.blueprint__media {
+    width: 100%;
+    margin-top: calc(10 * var(--fx));
+    aspect-ratio: 572 / 381.41;
+    border-radius: 0 calc(30 * var(--fx)) 0 calc(30 * var(--fx)); /* top-right + bottom-left */
+    overflow: hidden;
+}
+
+.blueprint__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ---- giant vertical heading (desktop) ---- */
+.blueprint__heading {
+    margin: 0;
+    display: flex;
+    align-items: flex-end; /* every column starts from the same baseline */
+    color: var(--primary-50);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: max(calc(100 * var(--fx)), 62px);
+    line-height: 1.1;
+}
+
+.blueprint__word {
+    display: block;
+    /* vertical text that reads bottom-to-top */
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+}
+
+.blueprint__heading-mobile {
+    display: none;
+}
+
+/* ---- Book a Demo CTA ---- */
+.blueprint__demo-row {
+    display: flex;
+    justify-content: center;
+    padding: calc(40 * var(--fx)) calc(20 * var(--fx));
+}
+
+.blueprint__demo {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(10 * var(--fx));
+    padding: calc(14 * var(--fx)) calc(24 * var(--fx));
+    background: var(--gold);
+    border-radius: calc(8 * var(--fx));
+    color: var(--navy-900);
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: max(calc(15 * var(--fx)), 13px);
+    line-height: 1.2;
+    text-decoration: none;
+    filter: drop-shadow(0 4px 10px rgba(201, 168, 76, 0.31));
+    transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.blueprint__demo:hover {
+    transform: translateY(-2px);
+    filter: drop-shadow(0 6px 16px rgba(201, 168, 76, 0.45));
+}
+
+.blueprint__demo-icon {
+    width: max(calc(16 * var(--fx)), 13px);
+    height: max(calc(16 * var(--fx)), 13px);
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   MOBILE (<=900px) — Figma 153:3333 + 153:3346, stacked
+   ============================================================ */
+@media (max-width: 900px) {
+    .blueprint__inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: calc(39 * var(--fx));
+        padding: calc(20 * var(--fx));
+    }
+
+    .blueprint__left {
+        width: 100%;
+        align-items: center;
+    }
+
+    .blueprint__pitch {
+        width: 100%;
+        color: var(--white);
+        font-size: max(calc(24 * var(--fx)), 18px);
+    }
+
+    .blueprint__cta {
+        height: calc(61.5 * var(--fx));
+        max-width: calc(260 * var(--fx));
+        font-size: max(calc(16 * var(--fx)), 14px);
+        line-height: 1.625;
+    }
+
+    .blueprint__media {
+        aspect-ratio: 350 / 233.38;
+    }
+
+    .blueprint__heading {
+        display: none; /* vertical version is desktop-only */
+    }
+
+    .blueprint__heading-mobile {
+        display: block;
+        margin: 0;
+        padding-top: calc(10 * var(--fx));
+        color: var(--white);
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: max(calc(24 * var(--fx)), 18px);
+        line-height: 1.167;
+    }
+
+    .blueprint__heading-mobile strong {
+        font-family: var(--font-body);
+        font-weight: 600;
+    }
+
+    .blueprint__demo-row {
+        padding: calc(32 * var(--fx)) calc(20 * var(--fx));
+    }
+}

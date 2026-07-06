@@ -1,15 +1,15 @@
 .work-card {
   /* tweak this to recolor the hover image (currently yellowish) */
-  --card-tint: #c9a84c;
+  --card-tint: var(--gold);
 
   position: relative;
   display: block;
   width: 100%;
-  height: 208.8px;
+  height: calc(208.8 * var(--fx));
   overflow: hidden;
   text-decoration: none;
   border-bottom: 1px solid #333;
-  background: #070b12;
+  background: var(--canvas);
   cursor: none; /* hide native cursor — the custom circle takes over */
 }
 
@@ -65,30 +65,30 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 57.6px;
+  padding: 0 calc(57.6 * var(--fx));
 }
 
 .work-card__left {
   display: flex;
   align-items: center;
-  gap: 43.19px;
+  gap: calc(43.19 * var(--fx));
 }
 
 .work-card__index {
-  font-family: 'Sans Serif Collection', sans-serif;
-  font-size: 14px;
-  line-height: 22px;
+  font-family: var(--font-display);
+  font-size: max(calc(14 * var(--fx)), 13px);
+  line-height: 1.571;
   color: #676767;
   transition: color 0.4s ease;
 }
 
 .work-card__name {
   margin: 0;
-  font-family: 'Sans Serif Collection', sans-serif;
+  font-family: var(--font-display);
   font-weight: 400;
-  font-size: 64px;
-  line-height: 70px;
-  color: #ffffff;
+  font-size: max(calc(64 * var(--fx)), 40px);
+  line-height: 1.094;
+  color: var(--white);
   white-space: nowrap;
   transition: transform 0.5s ease;
 }
@@ -98,51 +98,52 @@
 }
 
 .work-card:hover .work-card__index {
-  color: #c9a84c;
+  color: var(--gold);
 }
 
 .work-card__right {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 14.39px;
+  gap: calc(14.39 * var(--fx));
   text-align: right;
 }
 
 .work-card__tags {
-  font-family: 'Sans Serif Collection', sans-serif;
-  font-size: 14px;
-  line-height: 22px;
+  font-family: var(--font-display);
+  font-size: max(calc(14 * var(--fx)), 13px);
+  line-height: 1.571;
   color: #676767;
   transition: color 0.4s ease;
 }
 
 .work-card__year {
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  line-height: 14px;
+  font-family: var(--font-body);
+  font-size: max(calc(14 * var(--fx)), 13px);
+  line-height: 1;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #676767;
 }
 
 .work-card:hover .work-card__tags {
-  color: #fdfaf0;
+  color: var(--off-white);
 }
 
+/* ---- mobile (--fx base is 390) ---- */
 @media (max-width: 900px) {
   .work-card {
-    height: 150px;
+    height: calc(150 * var(--fx));
   }
   .work-card__inner {
-    padding: 0 24px;
+    padding: 0 calc(24 * var(--fx));
   }
   .work-card__name {
-    font-size: 34px;
-    line-height: 40px;
+    font-size: max(calc(34 * var(--fx)), 28px);
+    line-height: 1.176;
   }
   .work-card__left {
-    gap: 18px;
+    gap: calc(18 * var(--fx));
   }
   .work-card__right {
     display: none;

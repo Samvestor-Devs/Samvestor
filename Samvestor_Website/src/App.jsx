@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import Navbar from './components/Navbar';
+import HeroSection from './components/HeroSection';
 import WorkSection from './components/WorkSection';
 import ServicesSection from './components/ServicesSection';
 import ProcessSection from './components/ProcessSection';
@@ -8,6 +9,8 @@ import TeamSection from './components/TeamSection';
 import WhoSection from './components/WhoSection';
 import AboutSection from './components/AboutSection';
 import Preloader from './components/Preloader';
+import BlueprintSection from './components/BlueprintSection';
+import Footer from './components/Footer';
 
 // minimal hash routing so the About page is viewable at #/about
 function useHashRoute() {
@@ -33,12 +36,15 @@ function App() {
     // Home page
     <>
       <Navbar />
+      <HeroSection />
       <AboutSection />
       <ProcessSection />
       <WhoSection />
       <TeamSection />
       <WorkSection />
       <ServicesSection />
+      <BlueprintSection />
+      <Footer />
     </>
   );
 

@@ -1,5 +1,8 @@
 .services {
   position: relative;
   width: 100%;
+  /* the panels' sticky `top` calc resolves 100cqw against this section's
+     real width (100vw would wrongly include the scrollbar) */
+  container-type: inline-size;
   /* native cursor stays here — the custom circle belongs to WorkSection only */
 }
