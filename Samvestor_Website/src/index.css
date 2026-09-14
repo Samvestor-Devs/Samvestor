@@ -23,9 +23,11 @@
   --primary-50: #edf2f8; /* main light text */
   --white: #ffffff;
 
-  /* type */
+  /* type — Inter and Anton are self-hosted by next/font (see app/layout.jsx),
+     which exposes them as --font-inter / --font-anton */
   --font-display: 'Sans Serif Collection', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+  --font-accent: var(--font-anton), Impact, var(--font-body);
 
   /* fluid scale — desktop Figma frame is 1440 wide */
   --fx: calc(100vw / 1440);

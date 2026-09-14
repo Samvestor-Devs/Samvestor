@@ -1,19 +1,21 @@
+import Link from 'next/link';
 import './Footer.css';
 
+/* absolute hrefs so these work from any route, not just the home page */
 const QUICK_LINKS = [
-    { label: 'Home', href: '#home' },
-    { label: 'About Us', href: '#/about' },
-    { label: 'Services', href: '#services' },
-    { label: 'Case Studies', href: '#case-studies' },
-    { label: 'Contact Us', href: '#contact-us' },
+    { label: 'Home', href: '/' },
+    { label: 'About Us', href: '/about' },
+    { label: 'Services', href: '/#services' },
+    { label: 'Case Studies', href: '/#case-studies' },
+    { label: 'Contact Us', href: '/#contact-us' },
 ];
 
 const SERVICE_LINKS = [
-    { label: 'Performance Marketing', href: '#services' },
-    { label: 'Content & Copywriting', href: '#services' },
-    { label: 'Creative & Visual Lab', href: '#services' },
-    { label: 'Email & WhatsApp Marketing', href: '#services' },
-    { label: 'CRO & Funnel Optimization', href: '#services' },
+    { label: 'Performance Marketing', href: '/#services' },
+    { label: 'Content & Copywriting', href: '/#services' },
+    { label: 'Creative & Visual Lab', href: '/#services' },
+    { label: 'Email & WhatsApp Marketing', href: '/#services' },
+    { label: 'CRO & Funnel Optimization', href: '/#services' },
 ];
 
 const CONTACT = {
@@ -81,9 +83,9 @@ function Footer() {
                         <ul className="footer__list">
                             {QUICK_LINKS.map((link) => (
                                 <li key={link.label}>
-                                    <a className="footer__link" href={link.href}>
+                                    <Link className="footer__link" href={link.href}>
                                         {link.label}
-                                    </a>
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
@@ -94,9 +96,9 @@ function Footer() {
                         <ul className="footer__list">
                             {SERVICE_LINKS.map((link) => (
                                 <li key={link.label}>
-                                    <a className="footer__link" href={link.href}>
+                                    <Link className="footer__link" href={link.href}>
                                         {link.label}
-                                    </a>
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
