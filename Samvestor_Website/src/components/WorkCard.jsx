@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useRef, useState } from 'react';
 import './WorkCard.css';
 
@@ -17,6 +19,7 @@ const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ/.-';
  */
 function WorkCard({ index, name, tags, year, link, image }) {
   const [tagText, setTagText] = useState(tags);
+  const [renderedTags, setRenderedTags] = useState(tags);
   const frameRef = useRef(0);
   const rafRef = useRef(null);
   const cardRef = useRef(null);
@@ -24,10 +27,12 @@ function WorkCard({ index, name, tags, year, link, image }) {
   // while it passes through the middle band of the viewport
   const [active, setActive] = useState(false);
 
-  // keep the visible tags in sync if the prop ever changes
-  useEffect(() => {
+  // keep the visible tags in sync if the prop ever changes (adjusted during
+  // render rather than in an effect — React's recommended pattern)
+  if (renderedTags !== tags) {
+    setRenderedTags(tags);
     setTagText(tags);
-  }, [tags]);
+  }
 
   // clean up any running animation on unmount
   useEffect(() => () => cancelAnimationFrame(rafRef.current), []);

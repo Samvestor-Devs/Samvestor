@@ -1,6 +1,9 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import './Preloader.css';
-import logo from '../assets/sv-logo.png';
+
+const logo = '/sv-logo.png';
 
 /**
  * Instagram-style preloader: the SamVestor wordmark is "drawn on" by a

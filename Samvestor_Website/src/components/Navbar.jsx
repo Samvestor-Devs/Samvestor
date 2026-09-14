@@ -1,10 +1,16 @@
-import { useEffect, useState } from 'react';
-import './Navbar.css';
-import logoWhite from '../assets/sv-logo-white.png';
+'use client';
 
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import './Navbar.css';
+
+const logoWhite = '/sv-logo-white.png';
+
+/* `href` starting with "/" is a route; "#..." is a section on the home page. */
 const navItems = [
     { id: 'home', href: '#home', label: 'Home' },
-    { id: 'about-us', href: '#/about', label: 'About us' },
+    { id: 'about-us', href: '/about', label: 'About us' },
     { id: 'services', href: '#services', label: 'Services' },
     { id: 'careers', href: '#careers', label: 'Careers' },
     { id: 'case-studies', href: '#case-studies', label: 'Case Studies' },
@@ -16,6 +22,12 @@ const ctaLink = {
     label: 'Book A Call',
 };
 
+const isRoute = (href) => href.startsWith('/');
+
+// a section link points back at the home page when you're on another route
+const toHref = (href, pathname) =>
+    isRoute(href) || pathname === '/' ? href : `/${href}`;
+
 const PhoneIcon = () => (
     <svg className="cta-icon-svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M6.62 10.79c1.44 2.83 3.76 5.15 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.07 21 3 13.93 3 5.5c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
@@ -23,8 +35,9 @@ const PhoneIcon = () => (
 );
 
 function Navbar() {
+    const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [activeHref, setActiveHref] = useState('#home');
+    const [activeHash, setActiveHash] = useState('#home');
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
@@ -61,30 +74,27 @@ function Navbar() {
     const closeMobileMenu = () => setMobileOpen(false);
     const toggleMobileMenu = () => setMobileOpen((prev) => !prev);
 
+    const isActive = (href) =>
+        isRoute(href) ? pathname === href : pathname === '/' && activeHash === href;
+
     const handleNavigationClick = (event, href, isCta = false) => {
-        event.preventDefault();
         if (!href) return;
-
-        if (!isCta) {
-            setActiveHref(href);
-        }
-
         closeMobileMenu();
 
-        // route-level links (e.g. #/about) switch pages
-        if (href.startsWith('#/')) {
-            window.location.hash = href;
-            window.scrollTo(0, 0);
+        // route links (e.g. /about) are handled by <Link> itself
+        if (isRoute(href)) return;
+
+        if (!isCta) {
+            setActiveHash(href);
+        }
+
+        // on another route, let the router take us to /#section
+        if (pathname !== '/') {
             return;
         }
 
-        // a normal section link — if we're on a sub-route, go back to the
-        // homepage first, then scroll to the section
-        if (window.location.hash.startsWith('#/')) {
-            window.location.hash = '';
-            return;
-        }
-
+        // already home — smooth-scroll to the section instead of jumping
+        event.preventDefault();
         const target = document.querySelector(href);
         if (target) {
             target.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -95,26 +105,30 @@ function Navbar() {
         <>
             <nav className={`navbar-container ${scrolled ? 'scrolled' : ''}`}>
                 <div className="navbar">
-                    <a href="#home" className="navbar-brand" onClick={(event) => handleNavigationClick(event, '#home')}>
+                    <Link
+                        href={toHref('#home', pathname)}
+                        className="navbar-brand"
+                        onClick={(event) => handleNavigationClick(event, '#home')}
+                    >
                         <img className="brand-logo" src={logoWhite} alt="SamVestor" />
-                    </a>
+                    </Link>
 
                     <ul className="navbar-nav" id="navbarNav">
                         {navItems.map((item) => (
                             <li className="nav-item" key={item.id}>
-                                <a
-                                    href={item.href}
-                                    className={`nav-link ${activeHref === item.href ? 'active' : ''}`}
+                                <Link
+                                    href={toHref(item.href, pathname)}
+                                    className={`nav-link ${isActive(item.href) ? 'active' : ''}`}
                                     onClick={(event) => handleNavigationClick(event, item.href)}
                                 >
                                     <span>{item.label}</span>
-                                </a>
+                                </Link>
                             </li>
                         ))}
                     </ul>
 
-                    <a
-                        href={ctaLink.href}
+                    <Link
+                        href={toHref(ctaLink.href, pathname)}
                         className="cta-button"
                         onClick={(event) => handleNavigationClick(event, ctaLink.href, true)}
                     >
@@ -122,7 +136,7 @@ function Navbar() {
                             <PhoneIcon />
                         </span>
                         <span className="cta-label">{ctaLink.label}</span>
-                    </a>
+                    </Link>
 
                     <button
                         className={`mobile-toggle ${mobileOpen ? 'active' : ''}`}
@@ -148,9 +162,13 @@ function Navbar() {
 
             <div className={`mobile-menu ${mobileOpen ? 'active' : ''}`} id="mobileMenu" aria-hidden={!mobileOpen}>
                 <div className="mobile-menu-header">
-                    <a href="#home" className="mobile-menu-brand" onClick={(event) => handleNavigationClick(event, '#home')}>
+                    <Link
+                        href={toHref('#home', pathname)}
+                        className="mobile-menu-brand"
+                        onClick={(event) => handleNavigationClick(event, '#home')}
+                    >
                         <img className="brand-logo" src={logoWhite} alt="SamVestor" />
-                    </a>
+                    </Link>
                     <button
                         className="mobile-menu-close"
                         type="button"
@@ -165,20 +183,20 @@ function Navbar() {
                 <ul className="mobile-menu-nav">
                     {navItems.map((item) => (
                         <li className="mobile-menu-item" key={item.id}>
-                            <a
-                                href={item.href}
-                                className={`mobile-menu-link ${activeHref === item.href ? 'active' : ''}`}
+                            <Link
+                                href={toHref(item.href, pathname)}
+                                className={`mobile-menu-link ${isActive(item.href) ? 'active' : ''}`}
                                 onClick={(event) => handleNavigationClick(event, item.href)}
                             >
                                 <span>{item.label}</span>
-                            </a>
+                            </Link>
                         </li>
                     ))}
                 </ul>
 
                 <div className="mobile-cta">
-                    <a
-                        href={ctaLink.href}
+                    <Link
+                        href={toHref(ctaLink.href, pathname)}
                         className="cta-button mobile-cta-button"
                         onClick={(event) => handleNavigationClick(event, ctaLink.href, true)}
                     >
@@ -186,7 +204,7 @@ function Navbar() {
                             <PhoneIcon />
                         </span>
                         <span className="cta-label">{ctaLink.label}</span>
-                    </a>
+                    </Link>
                 </div>
             </div>
         </>
