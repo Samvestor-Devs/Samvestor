@@ -118,36 +118,35 @@ function ServicesSection() {
         const tl = gsap.timeline({
           defaults: { ease: 'none' },
           scrollTrigger: {
-            trigger: panel, // the sticky panel = stable measurement
-            // when this panel pins (matches the CSS sticky top: 0 on tall
-            // screens, bottom-aligned negative offset on wide screens)
-            start: () =>
-              'top ' +
-              Math.min(
-                0,
-                window.innerHeight -
-                  document.documentElement.clientWidth * (800 / 1440)
-              ) +
-              'px',
-            end: () => '+=' + panel.offsetHeight, // until the next card fully covers it
+            // measure from the (non-sticky) section: a sticky panel reports
+            // its stuck position if ScrollTrigger refreshes mid-scroll (e.g.
+            // on window resize), which would fire the recede at the wrong time.
+            // Every desktop panel is exactly one screen tall.
+            trigger: sectionRef.current,
+            // start/end functions are re-run on every refresh (e.g. resize).
+            // No invalidateOnRefresh: it would re-record the tween's start
+            // values mid-scroll, so a resize while tilted left cards stuck tilted.
+            start: () => `top+=${i * window.innerHeight} top`, // this panel pins
+            end: () => '+=' + window.innerHeight, // next card fully covers it
             scrub: 1, // 1s smoothing — eases toward the scroll position
-            invalidateOnRefresh: true,
           },
         });
 
-        tl.to(
+        // explicit start values: the card always tilts back from flat
+        tl.fromTo(
           card,
+          { rotate: 0, rotateX: 0, scale: 1, yPercent: 0 },
           {
             rotate: 2.0287 * dir, // z-rotation
             rotateX: 18, // tilt back in 3D (elegant, stays within the clip)
             scale: 0.9,
-            y: -28, // drift up slightly as it sinks back
+            yPercent: -3.1, // drift up slightly as it sinks back (28px on a 900px screen)
             force3D: true,
           },
           0
         );
 
-        if (overlay) tl.to(overlay, { opacity: 0.55 }, 0);
+        if (overlay) tl.fromTo(overlay, { opacity: 0 }, { opacity: 0.55 }, 0);
       });
 
       ScrollTrigger.refresh();

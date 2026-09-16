@@ -2,27 +2,25 @@
    Service panel — styled EXACTLY to the Figma (desktop 153:956,
    mobile 153:3201).
 
-   Fluid sizing: every size is  max(calc(size / REF * 100cqw), floor)
-     - REF 1440 on desktop (>=901px), REF 390 on mobile (<=900px)
-     - it grows on bigger screens and shrinks on smaller ones
-     - `floor` is the fixed least value a size may shrink to
-       (body/button text floor at their px so they stay readable)
+   Desktop: every card fills exactly one screen (full-bleed width and
+   height). The Figma 1440x800 card is laid out as an "artboard" inside
+   it, scaled to fit both the screen width and the space below the navbar,
+   and centred — so the title is never cut off or hidden under the navbar
+   and the space below the image is kept, on any desktop aspect ratio.
+   Sizes are  max(calc(N * var(--pu)), floor)  where --pu is one Figma px
+   of that artboard.
+
+   Mobile: sizes are  max(calc(N / 390 * 100cqw), floor).
    ============================================================ */
 
 /* ---- the stacking panel (sticky frame only — never transformed) ---- */
 .panel {
   position: sticky;
-  /* pin at the top of the screen — except when the full-width 1440:800 card
-     is taller than the viewport (very wide screens): then pin by the BOTTOM
-     edge (negative top) so the image and the space below it are fully
-     visible before the next card overlaps. Keep in sync with the
-     ScrollTrigger start in ServicesSection.jsx */
-  top: min(0px, calc(100vh - (100cqw * (800 / 1440))));
-  /* fluid full-bleed card: always the Figma frame's 1440:800 proportions */
-  aspect-ratio: 1440 / 800;
+  top: 0;
   width: 100%;
-  /* children size themselves in cqw against the card, not the viewport */
-  container-type: inline-size;
+  height: 100vh;
+  /* size container: the artboard measures the card's width AND height */
+  container-type: size;
   background: var(--canvas);
   perspective: 1600px;
   overflow: hidden;
@@ -33,8 +31,14 @@
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: flex-start; /* top-align content (matches Figma's top-down card) */
+  align-items: center;
   justify-content: center;
+  /* keep the artboard clear of the fixed navbar */
+  padding-top: var(--nav-safe);
+  box-sizing: border-box;
+  /* one Figma px of the 1440x800 artboard: the largest scale that fits both
+     the card width and the height left below the navbar */
+  --pu: min(calc(100cqw / 1440), calc((100cqh - var(--nav-safe)) / 800));
   transform-origin: center center;
   will-change: transform;
   transform: translateZ(0);
@@ -51,13 +55,17 @@
   z-index: 2;
 }
 
+/* the 1440x800 artboard — content sits at the top, leaving the design's
+   space below the image */
 .panel__inner {
-  width: 100%;
-  margin: 0 auto;
-  padding: max(calc(20 / 1440 * 100cqw), 13px) max(calc(16 / 1440 * 100cqw), 10px);
+  width: calc(1440 * var(--pu));
+  height: calc(800 * var(--pu));
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: max(calc(20 * var(--pu)), 13px) max(calc(16 * var(--pu)), 10px);
   display: flex;
   flex-direction: column;
-  gap: max(calc(32 / 1440 * 100cqw), 20px);
+  gap: max(calc(32 * var(--pu)), 20px);
 }
 
 /* ---- heading row: big title + number ---- */
@@ -65,7 +73,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: max(calc(24 / 1440 * 100cqw), 15px);
+  gap: max(calc(24 * var(--pu)), 15px);
 }
 
 .panel__title {
@@ -74,20 +82,23 @@
   flex-direction: column;
   font-family: var(--font-body);
   font-weight: 700;
-  font-size: max(calc(152 / 1440 * 100cqw), 95px);
+  /* no px floor on the title, text column or image: a floor breaks the
+     artboard's proportions on short screens (titles wrap to an extra line and
+     the image is pushed off the bottom). Only small copy keeps a floor. */
+  font-size: calc(152 * var(--pu));
   line-height: 0.906;
   letter-spacing: -0.0746em;
   color: var(--white);
   word-break: break-word;
   /* the small space the Figma heading box leaves below the title text,
      independent of how many lines the title wraps to */
-  padding-bottom: max(calc(20 / 1440 * 100cqw), 12px);
+  padding-bottom: max(calc(20 * var(--pu)), 12px);
 }
 
 .panel__number {
   font-family: var(--font-body);
   font-weight: 700;
-  font-size: max(calc(151.3 / 1440 * 100cqw), 95px);
+  font-size: calc(151.3 * var(--pu));
   line-height: 1.006;
   letter-spacing: -0.083em;
   color: var(--white);
@@ -99,8 +110,8 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: max(calc(12 / 1440 * 100cqw), 8px);
-  padding-top: max(calc(13 / 1440 * 100cqw), 8px);
+  gap: max(calc(12 * var(--pu)), 8px);
+  padding-top: max(calc(13 * var(--pu)), 8px);
   border-top: 1px solid #9d9d9d;
 }
 
@@ -108,8 +119,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end; /* button sits to the right, matching the design */
-  gap: max(calc(13 / 1440 * 100cqw), 8px);
-  width: max(calc(767 / 1440 * 100cqw), 479px);
+  gap: max(calc(13 * var(--pu)), 8px);
+  width: calc(767 * var(--pu));
   flex-shrink: 0;
 }
 
@@ -117,7 +128,7 @@
    with a trailing line of space below — matching the Figma text node */
 .panel__copy {
   width: 100%;
-  padding-bottom: max(calc(22 / 1440 * 100cqw), 14px);
+  padding-bottom: max(calc(22 * var(--pu)), 14px);
 }
 
 .panel__para {
@@ -127,7 +138,7 @@
   font-weight: 400;
   /* 11px floor (not 14) — the card has a fixed 1440:800 shape, so a big
      floor on small desktops pushes the copy and button out of the card */
-  font-size: max(calc(14 / 1440 * 100cqw), 11px);
+  font-size: max(calc(14 * var(--pu)), 11px);
   line-height: 1.571;
   color: var(--white);
 }
@@ -137,12 +148,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: max(calc(13 / 1440 * 100cqw), 8px) max(calc(27 / 1440 * 100cqw), 17px);
-  border-radius: max(calc(8 / 1440 * 100cqw), 5px);
+  padding: max(calc(13 * var(--pu)), 8px) max(calc(27 * var(--pu)), 17px);
+  border-radius: max(calc(8 * var(--pu)), 5px);
   border: 1.5px solid transparent;
   font-family: var(--font-body);
   font-weight: 600;
-  font-size: max(calc(15 / 1440 * 100cqw), 12px);
+  font-size: max(calc(15 * var(--pu)), 12px);
   line-height: 1.2;
   text-decoration: none;
   white-space: nowrap;
@@ -173,9 +184,9 @@
 
 /* ---- image ---- */
 .panel__media {
-  width: max(calc(553.564 / 1440 * 100cqw), 346px);
+  width: calc(553.564 * var(--pu));
   aspect-ratio: 552.58 / 420.17;
-  border-radius: max(calc(12 / 1440 * 100cqw), 7px);
+  border-radius: max(calc(12 * var(--pu)), 7px);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -198,9 +209,10 @@
    ============================================================ */
 @media (max-width: 900px) {
   .panel {
-    height: auto;
-    aspect-ratio: auto; /* mobile cards grow with their content */
+    height: auto; /* mobile cards grow with their content */
     min-height: auto;
+    /* inline-size, not size: size containment would collapse an auto height */
+    container-type: inline-size;
     /* keep the stack-over scroll on mobile too (no 3D recede — the next
        card simply slides up and covers the pinned one) */
     position: sticky;
@@ -211,10 +223,13 @@
   .panel__card {
     position: relative;
     inset: auto;
+    padding-top: 0;
     transform: none !important; /* no 3D recede on mobile */
   }
 
   .panel__inner {
+    width: 100%;
+    height: auto;
     padding: max(calc(20 / 390 * 100cqw), 16px);
     gap: max(calc(32 / 390 * 100cqw), 26px);
   }
