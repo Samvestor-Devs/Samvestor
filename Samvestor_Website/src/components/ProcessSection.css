@@ -152,9 +152,18 @@
 
 .process__sticky {
   position: sticky;
-  /* keeps the image vertically centred in the viewport while it's pinned */
-  top: max(24px, calc(50vh - 253 * var(--fx)));
-  height: calc(506 * var(--fx));
+  /* design height, capped on short screens so it fits between the navbar
+     and the bottom edge (object-fit: cover just crops a little more) */
+  --process-img-h: min(
+    calc(506 * var(--fx)),
+    calc(100vh - var(--nav-safe) - 32 * var(--fx))
+  );
+  /* vertically centred while pinned, but never tucked under the navbar */
+  top: max(
+    calc(var(--nav-safe) + 16 * var(--fx)),
+    calc(50vh - var(--process-img-h) / 2)
+  );
+  height: var(--process-img-h);
   border-radius: calc(16 * var(--fx));
   overflow: hidden;
 }

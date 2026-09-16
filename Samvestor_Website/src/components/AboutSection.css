@@ -13,17 +13,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 calc(28 * var(--fx));
+  /* centre the text in the space below the fixed navbar */
+  padding: var(--nav-safe) calc(28 * var(--fx)) 0;
   box-sizing: border-box;
   overflow: hidden;
 }
 
+/* --fs (not --fx) so the paragraph also shrinks on short screens and can
+   never be clipped by the 100vh stage */
 .about__text {
-  max-width: calc(1220 * var(--fx));
+  max-width: calc(1220 * var(--fs));
   margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: max(calc(50 * var(--fx)), 26px);
+  font-size: max(calc(50 * var(--fs)), 22px);
   line-height: 1.2;
   color: var(--primary-50);
   text-align: left; /* override the template's inherited text-align: center */

@@ -125,7 +125,9 @@
   width: 100%;
   font-family: var(--font-body);
   font-weight: 400;
-  font-size: max(calc(14 / 1440 * 100cqw), 14px);
+  /* 11px floor (not 14) — the card has a fixed 1440:800 shape, so a big
+     floor on small desktops pushes the copy and button out of the card */
+  font-size: max(calc(14 / 1440 * 100cqw), 11px);
   line-height: 1.571;
   color: var(--white);
 }
@@ -140,7 +142,7 @@
   border: 1.5px solid transparent;
   font-family: var(--font-body);
   font-weight: 600;
-  font-size: max(calc(15 / 1440 * 100cqw), 15px);
+  font-size: max(calc(15 / 1440 * 100cqw), 12px);
   line-height: 1.2;
   text-decoration: none;
   white-space: nowrap;

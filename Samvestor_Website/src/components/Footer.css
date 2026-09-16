@@ -12,8 +12,6 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: calc(60 * var(--fx));
-    max-width: 1440px;
-    margin: 0 auto;
     padding: calc(24 * var(--fx)) calc(60 * var(--fx)) calc(124 * var(--fx));
     box-sizing: border-box;
 }
@@ -150,8 +148,6 @@ a.footer__link:hover {
 
 /* ---- Giant embossed wordmark (pure CSS/SVG, no image) ---- */
 .footer__wordmark {
-    max-width: 1440px;
-    margin: 0 auto;
     line-height: 0;
     /* letters sink into the page bottom like the Figma mask */
     -webkit-mask-image: linear-gradient(180deg, #000 55%, rgba(0, 0, 0, 0.35) 100%);

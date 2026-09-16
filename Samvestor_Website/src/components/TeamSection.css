@@ -19,8 +19,6 @@
 .team__inner {
   position: relative;
   z-index: 1;
-  max-width: 1440px;
-  margin: 0 auto;
   padding: calc(40 * var(--fx)) calc(70 * var(--fx)) calc(60 * var(--fx));
 }
 

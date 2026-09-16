@@ -11,8 +11,6 @@
     align-items: center;
     justify-content: space-between;
     gap: calc(60 * var(--fx));
-    max-width: 1440px;
-    margin: 0 auto;
     padding: calc(20 * var(--fx)) calc(200 * var(--fx));
     box-sizing: border-box;
 }

@@ -14,10 +14,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: calc(80 * var(--fx)) calc(112 * var(--fx));
+  /* centre the composition in the space below the fixed navbar */
+  padding: var(--nav-safe) calc(112 * var(--fx)) 0;
   box-sizing: border-box;
   overflow: hidden;
 }
+
+/* Everything in this stage scales with --fs (not --fx): heading and card
+   fan keep their exact proportions to each other on every screen, and the
+   whole composition shrinks on short viewports instead of being clipped. */
 
 /* ---- header ---- */
 .who__head {
@@ -26,17 +31,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: calc(15 * var(--fx));
+  gap: calc(15 * var(--fs));
   text-align: center;
 }
 
 .who__badge {
   background: var(--gold-light);
   color: var(--canvas);
-  padding: calc(8 * var(--fx)) calc(12 * var(--fx));
-  border-radius: calc(8 * var(--fx));
+  padding: calc(8 * var(--fs)) calc(12 * var(--fs));
+  border-radius: calc(8 * var(--fs));
   font-family: var(--font-display);
-  font-size: max(calc(16 * var(--fx)), 13px);
+  font-size: max(calc(16 * var(--fs)), 11px);
   line-height: 1.625;
 }
 
@@ -44,7 +49,7 @@
   margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: max(calc(128 * var(--fx)), 80px);
+  font-size: calc(128 * var(--fs));
   line-height: 1;
   letter-spacing: -0.01em;
   text-transform: uppercase;
@@ -54,36 +59,35 @@
 .who__tag {
   margin: 0;
   font-family: var(--font-accent);
-  font-size: max(calc(18 * var(--fx)), 14px);
+  font-size: max(calc(18 * var(--fs)), 11px);
   line-height: 1.2;
   letter-spacing: 0.34px;
   text-transform: uppercase;
   color: #082620;
 }
 
-/* ---- card stage ----
-   The fan cards are positioned by GSAP in px, so the cards keep fixed
-   sizes and the whole stage scales as one unit per breakpoint. */
+/* ---- card stage (GSAP centres each card on its anchor via xPercent /
+   yPercent, so the anchors below can be fluid) ---- */
 .who__stage {
   position: relative;
   z-index: 1;
   width: 100%;
-  height: 460px;
+  height: calc(460 * var(--fs));
   /* pull the fanned cards up so they overlap the big heading, like the design */
-  margin-top: -150px;
+  margin-top: calc(-150 * var(--fs));
 }
 
 .who__card {
   position: absolute;
-  width: 314px;
-  height: 419px;
-  padding: 46px;
-  border-radius: 10px;
+  width: calc(314 * var(--fs));
+  height: calc(419 * var(--fs));
+  padding: calc(46 * var(--fs));
+  border-radius: calc(10 * var(--fs));
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 calc(24 * var(--fs)) calc(60 * var(--fs)) rgba(0, 0, 0, 0.45);
 }
 
 /* hidden until GSAP reveals it (avoids a flash before the trigger fires) —
@@ -96,14 +100,14 @@
 
 /* desktop fan anchors + colors — GSAP centres each card on its anchor point */
 .who__card--creative {
-  left: calc(50% - 128px);
+  left: calc(50% - 128 * var(--fs));
   top: 50%;
   z-index: 1;
   background: #e2c87a;
 }
 
 .who__card--scaling {
-  left: calc(50% + 128px);
+  left: calc(50% + 128 * var(--fs));
   top: 50%;
   z-index: 2;
   background: #d4b86a;
@@ -111,7 +115,7 @@
 
 .who__card--ambitious {
   left: 50%;
-  top: calc(50% - 32px);
+  top: calc(50% - 32 * var(--fs));
   z-index: 3;
   background: var(--gold-light);
 }
@@ -122,7 +126,7 @@
   flex-direction: column;
   font-family: var(--font-accent);
   font-weight: 400;
-  font-size: 36px;
+  font-size: calc(36 * var(--fs));
   line-height: 1.2;
   text-transform: uppercase;
   color: var(--white);
@@ -132,19 +136,9 @@
   margin: 0;
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: 15px;
+  font-size: max(calc(15 * var(--fs)), 10px);
   line-height: 1.6;
   color: var(--canvas);
-}
-
-/* ---- responsive ---- */
-@media (min-width: 901px) and (max-width: 1100px) {
-  /* scale the whole fan down so it still fits; GSAP transforms stay intact */
-  .who__stage {
-    transform: scale(0.7);
-    margin-top: -180px;
-    margin-bottom: -120px;
-  }
 }
 
 /* ============================================================
