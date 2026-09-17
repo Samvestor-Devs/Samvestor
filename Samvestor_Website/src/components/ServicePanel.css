@@ -43,6 +43,7 @@
   will-change: transform;
   transform: translateZ(0);
   backface-visibility: hidden;
+  background: var(--panel-bg);
 }
 
 /* depth dimmer — GSAP fades this in as the card sinks back */
@@ -287,4 +288,26 @@
     aspect-ratio: 349.97 / 238.69;
     border-radius: max(calc(12 / 390 * 100cqw), 11px);
   }
+}
+
+/* ============================================================
+   LIGHT THEME (Figma 153:1195) — each card takes its light colour
+   and ink from ServicesSection (--panel-bg-light / --panel-ink-light /
+   --panel-text-light); the frame behind a receding card is white
+   ============================================================ */
+:root[data-theme='light'] .panel {
+  background: var(--theme-page);
+}
+
+:root[data-theme='light'] .panel__card {
+  background: var(--panel-bg-light, var(--panel-bg));
+}
+
+:root[data-theme='light'] .panel__title,
+:root[data-theme='light'] .panel__number {
+  color: var(--panel-ink-light, var(--white));
+}
+
+:root[data-theme='light'] .panel__para {
+  color: var(--panel-text-light, var(--white));
 }

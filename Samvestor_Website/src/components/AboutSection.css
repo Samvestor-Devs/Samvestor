@@ -59,3 +59,8 @@
     font-size: max(calc(26 * var(--fx)), 20px);
   }
 }
+
+/* light theme: this band stays navy (Figma raised surface) */
+:root[data-theme='light'] .about {
+  background: var(--theme-raised);
+}

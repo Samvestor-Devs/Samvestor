@@ -172,3 +172,9 @@
     color: #8f8c8c;
   }
 }
+
+/* light theme: rows sit on the navy raised surface */
+:root[data-theme='light'] .work-card {
+  background: var(--theme-raised);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}

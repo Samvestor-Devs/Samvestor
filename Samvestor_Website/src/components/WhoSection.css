@@ -249,3 +249,18 @@
     color: #082620;
   }
 }
+
+/* ---- light theme: white section, dark heading; gold cards unchanged ---- */
+:root[data-theme='light'] .who {
+  background: var(--theme-page);
+}
+
+:root[data-theme='light'] .who__title {
+  color: var(--theme-ink);
+}
+
+@media (max-width: 900px) {
+  :root[data-theme='light'] .who__tag {
+    color: var(--theme-ink);
+  }
+}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import ThemeToggle from './ThemeToggle';
 import './Navbar.css';
 
 const logoWhite = '/sv-logo-white.png';
@@ -127,6 +128,8 @@ function Navbar() {
                         ))}
                     </ul>
 
+                    <ThemeToggle className="navbar-theme-toggle" />
+
                     <Link
                         href={toHref(ctaLink.href, pathname)}
                         className="cta-button"
@@ -193,6 +196,11 @@ function Navbar() {
                         </li>
                     ))}
                 </ul>
+
+                <div className="mobile-theme-row">
+                    <span className="mobile-theme-label">Light / dark mode</span>
+                    <ThemeToggle />
+                </div>
 
                 <div className="mobile-cta">
                     <Link

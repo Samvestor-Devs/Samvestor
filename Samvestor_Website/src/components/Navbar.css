@@ -68,6 +68,14 @@
     pointer-events: none;
 }
 
+/* light mode (Figma 153:1195): a grey frost, so the white logo and links
+   stay readable over both the white and the navy sections */
+:root[data-theme='light'] .navbar::before {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)),
+        rgba(96, 104, 118, 0.42);
+}
+
 /* users who ask the OS for less transparency get a solid bar */
 @media (prefers-reduced-transparency: reduce) {
     .navbar::before {
@@ -338,6 +346,33 @@
     border-color: rgba(255, 255, 255, 0.22);
 }
 
+/* ---- theme toggle ---- */
+.navbar-theme-toggle {
+    --tt-size: 44px;
+}
+
+.mobile-theme-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 30px;
+    padding: 10px 12px 10px 22px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.mobile-theme-row .theme-toggle {
+    --tt-size: 40px;
+}
+
+.mobile-theme-label {
+    color: #ffffff;
+    font-family: var(--sans);
+    font-size: 16px;
+}
+
 .mobile-cta {
     margin: 30px 30px 40px;
 }
@@ -393,6 +428,10 @@
         height: calc(50 * var(--fx));
     }
 
+    .navbar-theme-toggle {
+        --tt-size: calc(44 * var(--fx));
+    }
+
     .cta-icon-svg {
         width: calc(22 * var(--fx));
         height: calc(22 * var(--fx));
@@ -424,7 +463,8 @@
     }
 
     .navbar-nav,
-    .navbar>.cta-button {
+    .navbar>.cta-button,
+    .navbar-theme-toggle {
         display: none;
     }
 

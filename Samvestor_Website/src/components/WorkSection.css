@@ -92,3 +92,8 @@
     display: none;
   }
 }
+
+/* light theme: this band stays navy (Figma raised surface) */
+:root[data-theme='light'] .work-section {
+  background: var(--theme-raised);
+}

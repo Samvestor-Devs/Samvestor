@@ -150,3 +150,46 @@
     transform: scale(1);
   }
 }
+
+/* ---- light theme (Figma 153:1195): white screen, navy wordmark. The
+   silver PNG keeps the layout; a navy copy is painted through its shape ---- */
+:root[data-theme='light'] .preloader {
+  background: var(--white);
+}
+
+:root[data-theme='light'] .preloader__img {
+  opacity: 0;
+}
+
+:root[data-theme='light'] .preloader__reveal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--navy-900);
+  -webkit-mask: var(--sv-logo) center / contain no-repeat;
+  mask: var(--sv-logo) center / contain no-repeat;
+}
+
+/* the white beam and shimmer would vanish on white — tint them navy/gold */
+:root[data-theme='light'] .preloader__beam {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(11, 29, 58, 0.9) 25%,
+    var(--gold) 50%,
+    rgba(11, 29, 58, 0.9) 75%,
+    transparent
+  );
+  box-shadow:
+    0 0 12px 2px rgba(11, 29, 58, 0.35),
+    0 0 26px 6px rgba(201, 168, 76, 0.45);
+}
+
+:root[data-theme='light'] .preloader__shine {
+  background-image: linear-gradient(
+    105deg,
+    transparent 42%,
+    rgba(201, 168, 76, 0.9) 50%,
+    transparent 58%
+  );
+}

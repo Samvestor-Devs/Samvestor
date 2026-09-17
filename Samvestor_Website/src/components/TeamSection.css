@@ -154,3 +154,13 @@
     max-width: 100%;
   }
 }
+
+/* ---- light theme: white section, dark type ---- */
+:root[data-theme='light'] .team {
+  background: var(--theme-page);
+}
+
+:root[data-theme='light'] .team__title,
+:root[data-theme='light'] .team__intro {
+  color: var(--theme-ink);
+}

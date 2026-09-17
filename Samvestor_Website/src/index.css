@@ -43,6 +43,33 @@
   --fs: min(var(--fx), calc((100vh - var(--nav-safe)) / 796));
 }
 
+/* ---- theme (dark default / light) ----
+   <html data-theme> is set before first paint by the script in
+   app/layout.jsx and switched by ThemeToggle. Sections read these instead
+   of --canvas / --primary-50 wherever the light design differs. */
+:root {
+  --theme-page: var(--canvas); /* white sections in light mode */
+  --theme-raised: var(--canvas); /* sections that stay navy in light mode */
+  --theme-ink: var(--primary-50); /* headings/body on --theme-page */
+}
+
+:root[data-theme='light'] {
+  --theme-page: var(--white);
+  --theme-raised: #121e2e; /* Figma: Raised Surface — Elevated cards */
+  --theme-ink: #0a0a0a;
+}
+
+/* colours ease between themes; only during a switch, so scroll and hover
+   animations keep their own transitions the rest of the time */
+:root.theme-switching,
+:root.theme-switching *,
+:root.theme-switching *::before,
+:root.theme-switching *::after {
+  transition-property: background-color, color, border-color, fill, stroke !important;
+  transition-duration: 0.45s !important;
+  transition-timing-function: ease !important;
+}
+
 /* hamburger navbar: 20px offset + 68px bar */
 @media (max-width: 992px) {
   :root {

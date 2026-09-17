@@ -190,3 +190,14 @@
         padding: calc(32 * var(--fx)) calc(20 * var(--fx));
     }
 }
+
+/* ---- light theme: white section, dark type ---- */
+:root[data-theme='light'] .blueprint {
+    background: var(--theme-page);
+}
+
+:root[data-theme='light'] .blueprint__pitch,
+:root[data-theme='light'] .blueprint__heading,
+:root[data-theme='light'] .blueprint__heading-mobile {
+    color: var(--theme-ink);
+}

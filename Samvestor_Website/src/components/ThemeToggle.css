@@ -1,0 +1,117 @@
+/* ---- Dark / light toggle ----
+   Quiet by design: a hairline glass button that sits inside the navbar
+   like the other chrome, a slim line-weight icon, and a calm morph with no
+   bounce. Colour only brightens on hover — the gold stays reserved for CTAs. */
+.theme-toggle {
+    --tt-size: 44px;
+    flex-shrink: 0;
+    position: relative;
+    width: var(--tt-size);
+    height: var(--tt-size);
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.82);
+    cursor: pointer;
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease;
+    z-index: 2;
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.32);
+    color: #ffffff;
+}
+
+.theme-toggle:active {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.theme-toggle:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.85);
+    outline-offset: 3px;
+}
+
+.theme-toggle__svg {
+    width: 44%;
+    height: 44%;
+    display: block;
+    overflow: visible;
+}
+
+/* every moving part turns and scales around the icon's centre */
+.theme-toggle__svg,
+.theme-toggle__core,
+.theme-toggle__cut,
+.theme-toggle__rays {
+    transform-origin: 12px 12px;
+    transition:
+        transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.3s ease;
+}
+
+/* ---- sun (light mode): small disc, slim rays ---- */
+.theme-toggle--light .theme-toggle__svg {
+    transform: rotate(90deg);
+}
+
+.theme-toggle--light .theme-toggle__core {
+    transform: scale(0.5);
+}
+
+/* the carving circle waits outside the icon */
+.theme-toggle--light .theme-toggle__cut {
+    transform: translate(10px, -10px);
+}
+
+.theme-toggle--light .theme-toggle__rays {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+    transition-delay: 0.1s;
+}
+
+/* ---- moon (dark mode): the disc grows and a circle slides in to carve
+   the crescent while the rays retract ---- */
+.theme-toggle--dark .theme-toggle__svg {
+    transform: rotate(0deg);
+}
+
+.theme-toggle--dark .theme-toggle__core {
+    transform: scale(0.84);
+}
+
+.theme-toggle--dark .theme-toggle__cut {
+    transform: translate(-1px, 1px);
+}
+
+.theme-toggle--dark .theme-toggle__rays {
+    transform: rotate(-45deg) scale(0.6);
+    opacity: 0;
+}
+
+/* the page-wide colour ease (index.css, .theme-switching) would otherwise
+   replace these transitions and freeze the morph mid-switch */
+:root.theme-switching .theme-toggle__svg,
+:root.theme-switching .theme-toggle__core,
+:root.theme-switching .theme-toggle__cut,
+:root.theme-switching .theme-toggle__rays {
+    transition-property: transform, opacity !important;
+    transition-duration: 0.5s !important;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-toggle__svg,
+    .theme-toggle__core,
+    .theme-toggle__cut,
+    .theme-toggle__rays {
+        transition-duration: 0.01s;
+    }
+}

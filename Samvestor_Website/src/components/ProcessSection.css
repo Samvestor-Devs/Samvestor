@@ -254,3 +254,8 @@
     opacity: 1;
   }
 }
+
+/* light theme: this band stays navy (Figma raised surface) */
+:root[data-theme='light'] .process {
+  background: var(--theme-raised);
+}

@@ -164,3 +164,23 @@
         line-height: 1.625;
     }
 }
+
+/* ---- Light theme (Figma 153:1195): white hero, dark type. The video
+   stays, washed out under a light overlay. ---- */
+:root[data-theme='light'] .hero {
+    background: var(--theme-page);
+}
+
+:root[data-theme='light'] .hero__overlay {
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.86) 0%,
+        rgba(255, 255, 255, 0.74) 45%,
+        rgba(255, 255, 255, 0.9) 100%
+    );
+}
+
+:root[data-theme='light'] .hero__headline,
+:root[data-theme='light'] .hero__paragraph {
+    color: var(--theme-ink);
+}

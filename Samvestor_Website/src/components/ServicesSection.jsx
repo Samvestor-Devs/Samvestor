@@ -19,6 +19,7 @@ const PLACEHOLDER =
  *  - paragraphs: array of body paragraphs
  *  - image     : right-side image
  *  - bg        : panel background colour
+ *  - light     : light-theme colours { bg, ink (title + number), text (body) }
  *  - accent    : "gold" | "white"  -> Book A Call button outline
  */
 const SERVICES = [
@@ -31,6 +32,7 @@ const SERVICES = [
     ],
     image: PLACEHOLDER,
     bg: '#0b1d3a',
+    light: { bg: '#d4e0ee', ink: '#0a0a0a', text: '#0a0a0a' },
     accent: 'gold',
   },
   {
@@ -42,6 +44,7 @@ const SERVICES = [
     ],
     image: PLACEHOLDER,
     bg: '#1a2f52',
+    light: { bg: '#a8c0dc', ink: '#22262a', text: '#0a0a0a' },
     accent: 'white',
   },
   {
@@ -53,6 +56,7 @@ const SERVICES = [
     ],
     image: PLACEHOLDER,
     bg: '#243d66',
+    light: { bg: '#7a9cc4', ink: '#313e4e', text: '#edf2f8' },
     accent: 'gold',
   },
   {
@@ -64,6 +68,7 @@ const SERVICES = [
     ],
     image: PLACEHOLDER,
     bg: '#4a6fa5',
+    light: { bg: '#4a6fa5' },
     accent: 'gold',
   },
   {
@@ -75,6 +80,7 @@ const SERVICES = [
     ],
     image: PLACEHOLDER,
     bg: '#243d66',
+    light: { bg: '#2e4f80' },
     accent: 'gold',
   },
   {
@@ -86,6 +92,7 @@ const SERVICES = [
     ],
     image: PLACEHOLDER,
     bg: '#0b1d3a',
+    light: { bg: '#1a2f52' },
     accent: 'gold',
   },
 ];
