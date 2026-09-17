@@ -5,8 +5,8 @@ import './ProcessSection.css';
 
 /**
  * Each step has its own image. As a step becomes "active" (its top crosses
- * the vertical centre of the viewport) the sticky image crossfades to it and
- * the gold progress bar's leading tip sits at that centre line.
+ * the activation line, below the centre of the viewport) the sticky image
+ * crossfades to it and the gold progress bar's leading tip sits at that line.
  *
  * Swap the `image` URLs for your real per-step images.
  */
@@ -43,6 +43,7 @@ const STEPS = [
 
 function ProcessSection() {
   const trackRef = useRef(null);
+  const stickyRef = useRef(null);
   const fillRef = useRef(null);
   const itemRefs = useRef([]);
   const [active, setActive] = useState(0);
@@ -57,17 +58,34 @@ function ProcessSection() {
       if (!track || !fill) return;
 
       const trackRect = track.getBoundingClientRect();
-      const centerY = window.innerHeight / 2;
 
-      // grow the gold bar so its tip sits at the vertical centre of the screen
-      let filled = centerY - trackRect.top;
-      filled = Math.max(0, Math.min(filled, trackRect.height));
+      // the bar starts filling when the track's top reaches 65% down the
+      // screen, so steps light up well before they reach the centre
+      const lineY = window.innerHeight * 0.65;
+      const trackH = trackRect.height;
+      const items = itemRefs.current;
+
+      // on desktop the bar fills a little faster than you scroll, so it is
+      // completely full exactly when the pinned image lets go (the left
+      // column's bottom reaching the image's bottom). The last step stays
+      // highlighted with its image while the bar finishes filling.
+      let travel = trackH;
+      const sticky = stickyRef.current;
+      if (sticky && getComputedStyle(sticky).position === 'sticky') {
+        const imgBottom = parseFloat(getComputedStyle(sticky).top) + sticky.offsetHeight;
+        const left = track.parentElement;
+        const colBelowTrack = left.getBoundingClientRect().bottom - trackRect.bottom;
+        travel = Math.max(trackH + colBelowTrack + lineY - imgBottom, trackH * 0.3);
+      }
+
+      let filled = ((lineY - trackRect.top) * trackH) / travel;
+      filled = Math.max(0, Math.min(filled, trackH));
       fill.style.height = `${filled}px`;
 
-      // the active step = last one whose top has crossed the centre line
+      // the active step = last one the bar's tip has reached
       let idx = 0;
-      itemRefs.current.forEach((el, i) => {
-        if (el && el.getBoundingClientRect().top <= centerY) idx = i;
+      items.forEach((el, i) => {
+        if (el && el.getBoundingClientRect().top - trackRect.top <= filled) idx = i;
       });
       setActive((prev) => (prev === idx ? prev : idx));
     };
@@ -124,7 +142,7 @@ function ProcessSection() {
 
         {/* right: sticky crossfading image */}
         <div className="process__media">
-          <div className="process__sticky">
+          <div className="process__sticky" ref={stickyRef}>
             {STEPS.map((step, i) => (
               <img
                 key={step.title}

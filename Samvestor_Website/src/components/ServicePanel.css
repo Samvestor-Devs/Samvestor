@@ -143,7 +143,7 @@
   color: var(--white);
 }
 
-/* ---- Book A Call button (desktop = FILLED) ---- */
+/* ---- Book A Call button: outline, fills gold on hover ---- */
 .panel__cta {
   display: inline-flex;
   align-items: center;
@@ -151,34 +151,34 @@
   padding: max(calc(13 * var(--pu)), 8px) max(calc(27 * var(--pu)), 17px);
   border-radius: max(calc(8 * var(--pu)), 5px);
   border: 1.5px solid transparent;
+  background: transparent;
   font-family: var(--font-body);
   font-weight: 600;
   font-size: max(calc(15 * var(--pu)), 12px);
   line-height: 1.2;
   text-decoration: none;
   white-space: nowrap;
-  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease,
+    transform 0.3s ease;
 }
 
+/* every button has a gold outline and fills gold on hover; the accent only
+   sets the text colour */
 .panel__cta--gold {
-  background: var(--gold);
   border-color: var(--gold);
   color: var(--off-white);
 }
-.panel__cta--gold:hover {
-  background: var(--gold-dark);
-  border-color: var(--gold-dark);
-  transform: translateY(-2px);
-}
 
 .panel__cta--white {
-  background: var(--white);
-  border-color: var(--white);
-  color: var(--navy-900);
+  border-color: var(--gold);
+  color: var(--white);
 }
-.panel__cta--white:hover {
-  background: #e6e6e6;
-  border-color: #e6e6e6;
+
+.panel__cta:hover,
+.panel__cta:focus-visible {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--off-white);
   transform: translateY(-2px);
 }
 
@@ -273,30 +273,11 @@
     text-align: left;
   }
 
-  /* button on mobile = OUTLINE */
   .panel__cta {
     padding: max(calc(13 / 390 * 100cqw), 11px) max(calc(27 / 390 * 100cqw), 22px);
     border-radius: max(calc(8 / 390 * 100cqw), 7px);
     font-size: max(calc(16 / 390 * 100cqw), 16px);
     line-height: 1.625;
-  }
-  .panel__cta--gold {
-    background: transparent;
-    border-color: var(--gold);
-    color: var(--off-white);
-  }
-  .panel__cta--gold:hover {
-    background: var(--gold);
-    color: var(--navy-900);
-  }
-  .panel__cta--white {
-    background: transparent;
-    border-color: var(--white);
-    color: var(--white);
-  }
-  .panel__cta--white:hover {
-    background: var(--white);
-    color: var(--navy-900);
   }
 
   /* image: full-width, mobile aspect ratio */

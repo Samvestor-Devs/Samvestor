@@ -64,30 +64,25 @@
     calc(var(--nav-safe) + 16 * var(--fx)),
     calc(50vh - var(--process-img-h) / 2)
   );
-  /* extra track below the last step: a sticky element unpins when its column
-     runs out, so without this the image scrolls away just as the last step
-     activates (at the screen centre). This keeps it pinned until the last
-     step has been active for a further 80 figma px of scrolling. */
-  --process-tail: calc(
-    var(--process-img-top) + var(--process-img-h) - 50vh + 80 * var(--fx)
-  );
 }
 
 /* ---- left column (track + steps) ---- */
 .process__left {
   position: relative;
   padding-left: calc(50 * var(--fx));
-  padding-bottom: var(--process-tail);
+  /* small space below the last step — the gold track runs on into it, so
+     the last step stays highlighted with its image while the bar finishes */
+  --process-hold: calc(40 * var(--fx));
+  padding-bottom: var(--process-hold);
   flex: 1 1 0;
   max-width: calc(609 * var(--fx));
 }
 
-/* the progress track ends at the last step, not at the extra tail */
 .process__track {
   position: absolute;
   left: 0;
   top: 0;
-  bottom: var(--process-tail);
+  bottom: 0;
   width: 5px;
 }
 
@@ -105,7 +100,7 @@
   );
 }
 
-/* the gold bar — its height is driven from JS so the tip sits at screen centre */
+/* the gold bar — its height is driven from JS (see ProcessSection.jsx) */
 .process__track-fill {
   position: absolute;
   left: 0;
@@ -239,10 +234,7 @@
   .process__left {
     max-width: 100%;
     padding-left: calc(30 * var(--fx));
-    padding-bottom: 0; /* image isn't pinned on mobile — no tail needed */
-  }
-  .process__track {
-    bottom: 0;
+    --process-hold: 0px; /* image isn't pinned on mobile — no space needed */
   }
   .process__media {
     width: 100%;
