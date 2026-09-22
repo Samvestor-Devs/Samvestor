@@ -3,22 +3,41 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { CustomEase } from 'gsap/CustomEase';
 import createGlobe from 'cobe';
 import useTheme from '../lib/useTheme';
 import './AboutHero.css'; // reuse the wordmark / states / pin styles
 import './AboutHeroGlobe.css'; // globe-specific styles
 
-gsap.registerPlugin(ScrollTrigger, CustomEase);
+gsap.registerPlugin(ScrollTrigger);
 
-// same entrance feel as AboutHero
-const RISE_EASE = CustomEase.create('heroRiseGlobe', 'M0,0 C0.16,1 0.3,1 1,1');
-const RISE_DURATION = 0.75;
-const RISE_STAGGER = 0.025;
-const RISE_DELAY = 0.3;
-const RISE_OFFSET = 1;
-const RISE_LEAN = 11;
-const RISE_LEAN_DROP = 30;
+// wordmark entrance once the intro wipes away: each letter swings up out of
+// the floor in 3D, stretched and fanned, then settles — a wave left to right
+const RISE_DURATION = 1.6;
+const RISE_STAGGER = 0.06;
+const RISE_TILT = -80; // rotationX the letters start at (deg)
+const RISE_FAN = 3; // extra lean per letter away from the centre (deg)
+const RISE_PERSPECTIVE = 900; // same value at both ends of the tween
+
+// calls back as the site preloader starts fading out (or right away if it
+// isn't up, e.g. after a client-side navigation), so the wordmark rises into
+// view instead of playing hidden under the splash
+function whenSplashLeaves(callback) {
+  const splashUp = () => {
+    const el = document.querySelector('.preloader');
+    return el && !el.classList.contains('preloader--exit');
+  };
+  if (!splashUp()) {
+    callback();
+    return () => {};
+  }
+  const mo = new MutationObserver(() => {
+    if (splashUp()) return;
+    mo.disconnect();
+    callback();
+  });
+  mo.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+  return () => mo.disconnect();
+}
 
 const BRAND = 'SAMVESTOR'.split('');
 
@@ -135,6 +154,7 @@ function AboutHeroGlobe() {
 
   // ---- entrance + scroll state machine (mirrors AboutHero; globe replaces video) ----
   useEffect(() => {
+    let stopWaiting = () => {};
     const ctx = gsap.context(() => {
       const q = gsap.utils.selector(sectionRef);
       const brand = q('.ahero__brand')[0];
@@ -151,21 +171,32 @@ function AboutHeroGlobe() {
       ).matches;
 
       if (reduceMotion) {
-        gsap.set(letters, { y: 0, skewX: 0 });
+        gsap.set(letters, { clearProps: 'transform' });
       } else {
-        const last = letters.length - 1;
-        const progress = (i) => (last > 0 ? i / last : 0);
-        gsap.from(letters, {
-          y: (i, target) =>
-            target.parentElement.getBoundingClientRect().height * RISE_OFFSET +
-            RISE_LEAN_DROP * progress(i),
-          skewX: (i) => -RISE_LEAN * progress(i),
-          transformOrigin: '0% 100%',
-          duration: RISE_DURATION,
-          ease: RISE_EASE,
-          stagger: RISE_STAGGER,
-          delay: RISE_DELAY,
-        });
+        const mid = (letters.length - 1) / 2;
+        const entrance = gsap.fromTo(
+          letters,
+          {
+            yPercent: 115,
+            rotationX: RISE_TILT,
+            rotation: (i) => (i - mid) * RISE_FAN,
+            scaleY: 1.35,
+            transformOrigin: '50% 100%',
+            transformPerspective: RISE_PERSPECTIVE,
+          },
+          {
+            yPercent: 0,
+            rotationX: 0,
+            rotation: 0,
+            scaleY: 1,
+            transformPerspective: RISE_PERSPECTIVE,
+            duration: RISE_DURATION,
+            ease: 'expo.out',
+            stagger: RISE_STAGGER,
+            paused: true,
+          }
+        );
+        stopWaiting = whenSplashLeaves(() => entrance.play());
       }
 
       // the [phi, theta] that faces the target coordinate
@@ -209,7 +240,10 @@ function AboutHeroGlobe() {
       ScrollTrigger.refresh();
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => {
+      stopWaiting();
+      ctx.revert();
+    };
   }, []);
 
   return (
