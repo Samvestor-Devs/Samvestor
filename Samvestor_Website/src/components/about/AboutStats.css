@@ -1,0 +1,168 @@
+/* Stats — navy band in light mode, canvas in dark (Figma SV About Us) */
+.astats {
+    --astats-bg: var(--canvas);
+    position: relative;
+    background: var(--astats-bg);
+    color: var(--primary-50);
+    padding: calc(90 * var(--fx)) 0 calc(160 * var(--fx));
+    overflow: clip;
+}
+
+:root[data-theme='light'] .astats {
+    --astats-bg: var(--navy-900);
+}
+
+/* the heading pins while the cards float over it */
+.astats__head {
+    position: sticky;
+    top: calc(120 * var(--fx));
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(16 * var(--fx));
+    padding: 0 calc(40 * var(--fx));
+    text-align: center;
+}
+
+.astats__title {
+    margin: 0;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: max(calc(40 * var(--fx)), 26px);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+}
+
+.astats__sub {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: max(calc(13 * var(--fx)), 12px);
+    line-height: 1.5;
+    color: rgba(237, 242, 248, 0.75);
+}
+
+/* ---- the card field (desktop: scattered, positions from the design) ---- */
+.astats__field {
+    position: relative;
+    z-index: 1;
+    list-style: none;
+    margin: calc(130 * var(--fx)) 0 0;
+    padding: 0;
+    height: calc(1560 * var(--fx));
+}
+
+.astats__card {
+    position: absolute;
+    width: calc(310 * var(--fx));
+    height: calc(358 * var(--fx));
+}
+
+.astats__card--1 { left: calc(442 * var(--fx)); top: 0; }
+.astats__card--2 { left: calc(1058 * var(--fx)); top: calc(110 * var(--fx)); }
+.astats__card--3 { left: calc(133 * var(--fx)); top: calc(560 * var(--fx)); }
+.astats__card--4 { left: calc(658 * var(--fx)); top: calc(660 * var(--fx)); }
+.astats__card--5 { left: calc(551 * var(--fx)); top: calc(1160 * var(--fx)); }
+
+.astats__card-inner {
+    height: 100%;
+    box-sizing: border-box;
+    padding: calc(30 * var(--fx)) calc(24 * var(--fx)) calc(28 * var(--fx));
+    border-radius: calc(14 * var(--fx));
+    background: #ffffff;
+    color: var(--navy-900);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 calc(30 * var(--fx)) calc(60 * var(--fx)) rgba(0, 0, 0, 0.28);
+}
+
+.astats__value {
+    margin-top: calc(38 * var(--fx));
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: calc(58 * var(--fx));
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.astats__text {
+    display: flex;
+    flex-direction: column;
+    gap: calc(4 * var(--fx));
+    font-family: var(--font-body);
+    font-size: max(calc(18 * var(--fx)), 13px);
+    line-height: 1.25;
+}
+
+.astats__text strong {
+    font-weight: 800;
+}
+
+.astats__text span {
+    font-weight: 700;
+    opacity: 0.8;
+}
+
+/* ---- mobile (Figma 15:2254): heading, then a swipeable row ---- */
+@media (max-width: 900px) {
+    .astats {
+        padding: calc(32 * var(--fx)) 0 calc(40 * var(--fx));
+    }
+
+    .astats__head {
+        position: static;
+        padding: 0 calc(20 * var(--fx));
+        gap: calc(12 * var(--fx));
+    }
+
+    .astats__title {
+        font-weight: 400;
+        font-family: var(--font-display);
+        font-size: calc(22 * var(--fx));
+    }
+
+    .astats__sub {
+        font-size: calc(10 * var(--fx));
+    }
+
+    .astats__field {
+        height: auto;
+        margin-top: calc(26 * var(--fx));
+        display: flex;
+        gap: calc(12 * var(--fx));
+        padding: 0 calc(20 * var(--fx)) calc(8 * var(--fx));
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+    }
+
+    .astats__field::-webkit-scrollbar {
+        display: none;
+    }
+
+    .astats__card {
+        position: static;
+        flex: 0 0 calc(310 * var(--fx));
+        height: calc(360 * var(--fx));
+        scroll-snap-align: center;
+    }
+
+    .astats__card-inner {
+        border-radius: calc(12 * var(--fx));
+        padding: calc(28 * var(--fx)) calc(20 * var(--fx));
+    }
+
+    .astats__value {
+        font-size: calc(60 * var(--fx));
+    }
+
+    .astats__text {
+        font-size: calc(18 * var(--fx));
+    }
+}

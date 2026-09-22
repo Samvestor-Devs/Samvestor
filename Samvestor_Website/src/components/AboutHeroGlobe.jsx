@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CustomEase } from 'gsap/CustomEase';
 import createGlobe from 'cobe';
+import useTheme from '../lib/useTheme';
 import './AboutHero.css'; // reuse the wordmark / states / pin styles
 import './AboutHeroGlobe.css'; // globe-specific styles
 
@@ -31,6 +32,26 @@ const GLOBE_MARKERS = [
 ];
 const GLOBE_SMOOTH = 0.09; // 0–1; lower = smoother/laggier follow of the scroll target
 
+// globe look per theme (cobe colours are 0–1 RGB)
+const GLOBE_LOOK = {
+  dark: {
+    dark: 1,
+    diffuse: 1.4,
+    mapBrightness: 9,
+    baseColor: [0.42, 0.45, 0.52], // brighter landmass so it reads on dark bg
+    markerColor: [0.85, 0.7, 0.32], // gold #c9a84c
+    glowColor: [0.18, 0.22, 0.3],
+  },
+  light: {
+    dark: 0,
+    diffuse: 1.2,
+    mapBrightness: 5,
+    baseColor: [0.83, 0.88, 0.94], // pale navy-tinted sphere on white
+    markerColor: [0.79, 0.62, 0.2],
+    glowColor: [0.93, 0.95, 0.98],
+  },
+};
+
 // cobe helper: a lat/lng -> the [phi, theta] that brings the point to the front
 const locationToAngles = (lat, lng) => [
   Math.PI - ((lng * Math.PI) / 180 - Math.PI / 2),
@@ -38,6 +59,7 @@ const locationToAngles = (lat, lng) => [
 ];
 
 function AboutHeroGlobe() {
+  const theme = useTheme();
   const sectionRef = useRef(null);
   const canvasRef = useRef(null);
   // scroll writes the desired rotation here; the globe eases toward it
@@ -56,33 +78,45 @@ function AboutHeroGlobe() {
     });
     ro.observe(canvas);
 
-    let curPhi = GLOBE_START.phi;
-    let curTheta = GLOBE_START.theta;
+    // start from wherever scroll has the globe (matters when the theme
+    // switches mid-page and the globe is rebuilt)
+    let curPhi = phiTarget.current;
+    let curTheta = thetaTarget.current;
+
+    const look = GLOBE_LOOK[theme] ?? GLOBE_LOOK.dark;
 
     const globe = createGlobe(canvas, {
       devicePixelRatio: 2,
       width: width * 2,
       height: width * 2,
-      phi: GLOBE_START.phi,
-      theta: GLOBE_START.theta,
-      dark: 1,
-      diffuse: 1.4,
+      phi: curPhi,
+      theta: curTheta,
       mapSamples: 16000,
-      mapBrightness: 9,
-      baseColor: [0.42, 0.45, 0.52], // brighter landmass so it reads on dark bg
-      markerColor: [0.85, 0.7, 0.32], // gold #c9a84c
-      glowColor: [0.18, 0.22, 0.3],
+      ...look,
       markers: GLOBE_MARKERS,
-      onRender: (state) => {
-        // ease the live rotation toward the scroll-driven target each frame
-        curPhi += (phiTarget.current - curPhi) * GLOBE_SMOOTH;
-        curTheta += (thetaTarget.current - curTheta) * GLOBE_SMOOTH;
-        state.phi = curPhi;
-        state.theta = curTheta;
-        state.width = width * 2;
-        state.height = width * 2;
-      },
     });
+
+    // cobe v2 has no render loop of its own — drive it: ease toward the
+    // scroll target, plus a slow idle drift so the scene is always alive
+    // (like Lusion's). Paused while the hero is off-screen.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let idle = 0;
+    let raf = 0;
+    let visible = true;
+    const frame = () => {
+      raf = requestAnimationFrame(frame);
+      if (!visible) return;
+      if (!reduceMotion) idle += 0.0012;
+      curPhi += (phiTarget.current + idle - curPhi) * GLOBE_SMOOTH;
+      curTheta += (thetaTarget.current - curTheta) * GLOBE_SMOOTH;
+      globe.update({ phi: curPhi, theta: curTheta, width: width * 2, height: width * 2 });
+    };
+    raf = requestAnimationFrame(frame);
+
+    const io = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+    });
+    io.observe(canvas);
 
     // fade the globe in once it's actually drawing
     const t = setTimeout(() => {
@@ -91,10 +125,13 @@ function AboutHeroGlobe() {
 
     return () => {
       clearTimeout(t);
+      cancelAnimationFrame(raf);
+      io.disconnect();
       ro.disconnect();
       globe.destroy();
     };
-  }, []);
+    // rebuilt when the theme changes — cobe can't recolour a live globe
+  }, [theme]);
 
   // ---- entrance + scroll state machine (mirrors AboutHero; globe replaces video) ----
   useEffect(() => {
@@ -144,6 +181,8 @@ function AboutHeroGlobe() {
           start: 'top top',
           end: 'bottom bottom',
           scrub: 1,
+          // the wordmark's rise is a share of the screen height
+          invalidateOnRefresh: true,
           onUpdate: (self) => {
             // map scroll progress -> rotate the globe from start to the target
             const p = self.progress;
@@ -155,12 +194,16 @@ function AboutHeroGlobe() {
         },
       });
 
-      tl.to(brand, { y: -60, autoAlpha: 0, ease: 'power1.in', duration: 1 }, 3.8);
-      tl.from(s2L, { xPercent: -135, autoAlpha: 0, ease: 'power3.out', duration: 1.2 }, 0.6);
-      tl.from(s2R, { xPercent: 135, autoAlpha: 0, ease: 'power3.out', duration: 1.2 }, 0.6);
+      // Figma order: the wordmark rises to the top of the screen first, the
+      // first pair of lines slides in beneath it, then the wordmark leaves
+      // and the second pair takes over.
+      tl.fromTo(brand, { y: 0 }, { y: () => -window.innerHeight * 0.62, ease: 'power2.inOut', duration: 1.1 }, 0);
+      tl.from(s2L, { xPercent: -135, autoAlpha: 0, ease: 'power3.out', duration: 1.2 }, 0.55);
+      tl.from(s2R, { xPercent: 135, autoAlpha: 0, ease: 'power3.out', duration: 1.2 }, 0.7);
+      tl.to(brand, { autoAlpha: 0, y: () => -window.innerHeight * 0.9, ease: 'power1.in', duration: 0.8 }, 2.3);
       tl.to([s2L, s2R], { autoAlpha: 0, y: -40, ease: 'power2.in', duration: 1 }, 2.6);
       tl.from(s3L, { xPercent: -135, autoAlpha: 0, ease: 'power3.out', duration: 1.2 }, 2.85);
-      tl.from(s3R, { xPercent: 135, autoAlpha: 0, ease: 'power3.out', duration: 1.2 }, 2.85);
+      tl.from(s3R, { xPercent: 135, autoAlpha: 0, ease: 'power3.out', duration: 1.2 }, 3.0);
       tl.to({}, { duration: 0.8 });
 
       ScrollTrigger.refresh();

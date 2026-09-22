@@ -1,0 +1,342 @@
+/* "What We Do Relentlessly" — Figma SV About Us (desktop 1440 via --fx).
+   Navy band in light mode, canvas in dark; cream cards in light, pale blue
+   cards in dark. */
+.arel {
+    --arel-bg: var(--canvas);
+    --arel-card: #edf2f8;
+    position: relative;
+    background: var(--arel-bg);
+    color: #ffffff;
+    padding: calc(120 * var(--fx)) calc(40 * var(--fx)) calc(150 * var(--fx));
+    overflow: clip;
+    text-align: center;
+}
+
+:root[data-theme='light'] .arel {
+    --arel-bg: var(--navy-900);
+    --arel-card: #fbf8ee;
+}
+
+/* ---- the drawn rings / lines ---- */
+.arel__lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.arel__lines path {
+    fill: none;
+    stroke-width: 26;
+    stroke-linecap: round;
+}
+
+.arel__ring {
+    stroke: #d4e0ee;
+}
+
+.arel__flow {
+    stroke: #a8c0dc;
+}
+
+.arel__flow--soft {
+    stroke: #7a9cc4;
+}
+
+/* ---- headline ---- */
+.arel__title {
+    position: relative;
+    margin: 0;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: calc(128 * var(--fx));
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    transform-origin: 50% 0%;
+}
+
+/* ---- deck spot (a card-sized space under the headline) ---- */
+.arel__deck {
+    width: calc(300 * var(--fx));
+    height: calc(420 * var(--fx));
+    margin: calc(60 * var(--fx)) auto 0;
+}
+
+/* ---- the cards ---- */
+.arel__grid {
+    position: relative;
+    list-style: none;
+    margin: calc(520 * var(--fx)) auto 0;
+    padding: 0;
+    max-width: calc(1340 * var(--fx));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: calc(30 * var(--fx)) calc(42 * var(--fx));
+}
+
+.arel__card {
+    position: relative;
+    width: calc(300 * var(--fx));
+    height: calc(420 * var(--fx));
+}
+
+.arel__card-inner {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.arel__face {
+    position: absolute;
+    inset: 0;
+    border-radius: calc(14 * var(--fx));
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    box-shadow: 0 calc(24 * var(--fx)) calc(50 * var(--fx)) rgba(0, 0, 0, 0.3);
+}
+
+/* card front: fine card stock with the same inset gold keyline as the back,
+   corner indices like a playing card, and a foil sheen on hover */
+.arel__face--front {
+    --arel-gold: #a8852f;
+    --arel-ink: var(--navy-900, #0b1a2e);
+    box-sizing: border-box;
+    padding: calc(58 * var(--fx)) calc(30 * var(--fx));
+    background:
+        radial-gradient(120% 70% at 50% 0%, rgba(255, 255, 255, 0.75), transparent 60%),
+        radial-gradient(90% 60% at 50% 110%, rgba(201, 168, 76, 0.12), transparent 70%),
+        var(--arel-card);
+    color: var(--arel-ink);
+    display: flex;
+    overflow: hidden;
+}
+
+.arel__face--front::before {
+    content: '';
+    position: absolute;
+    inset: calc(8 * var(--fx));
+    border: 1.5px solid rgba(168, 133, 47, 0.45);
+    border-radius: calc(6 * var(--fx));
+    pointer-events: none;
+}
+
+.arel__face--front::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        115deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.55) 48%,
+        rgba(201, 168, 76, 0.18) 52%,
+        transparent 65%
+    );
+    transform: translateX(-120%);
+    pointer-events: none;
+}
+
+.arel__card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: calc(14 * var(--fx));
+}
+
+/* corner index: number over a gold pip */
+.arel__index {
+    position: absolute;
+    top: calc(20 * var(--fx));
+    left: calc(22 * var(--fx));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(6 * var(--fx));
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: max(calc(17 * var(--fx)), 12px);
+    line-height: 1;
+    letter-spacing: 0.02em;
+    color: var(--arel-ink);
+}
+
+.arel__index--flip {
+    top: auto;
+    left: auto;
+    bottom: calc(20 * var(--fx));
+    right: calc(22 * var(--fx));
+    transform: rotate(180deg);
+}
+
+.arel__pip {
+    display: block;
+    width: calc(7 * var(--fx));
+    height: calc(7 * var(--fx));
+    min-width: 5px;
+    min-height: 5px;
+    background: var(--arel-gold);
+    transform: rotate(45deg);
+}
+
+/* gold rule with a pip in the middle */
+.arel__rule {
+    display: flex;
+    align-items: center;
+    gap: calc(8 * var(--fx));
+    width: 56%;
+}
+
+.arel__rule::before,
+.arel__rule::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--arel-gold));
+}
+
+.arel__rule::after {
+    background: linear-gradient(90deg, var(--arel-gold), transparent);
+}
+
+/* lift + sheen on hover (pointer devices only) */
+@media (hover: hover) and (min-width: 901px) {
+    .arel__card {
+        transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .arel__card:hover {
+        transform: translateY(calc(-10 * var(--fx)));
+    }
+
+    .arel__card:hover .arel__face--front::after {
+        transform: translateX(120%);
+        transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+}
+
+/* card back: navy with a gold keyline and the logo */
+.arel__face--back {
+    transform: rotateY(180deg);
+    background: var(--navy-500);
+    border: calc(10 * var(--fx)) solid var(--navy-700);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.arel__face--back::before {
+    content: '';
+    position: absolute;
+    inset: calc(8 * var(--fx));
+    border: 1.5px solid rgba(201, 168, 76, 0.7);
+    border-radius: calc(6 * var(--fx));
+}
+
+.arel__back-logo {
+    width: 58%;
+    height: auto;
+    opacity: 0.9;
+}
+
+.arel__card-title {
+    margin: 0;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: max(calc(19 * var(--fx)), 14px);
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-wrap: balance;
+}
+
+.arel__card-sub {
+    margin: 0;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: max(calc(13 * var(--fx)), 11px);
+    line-height: 1.35;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--arel-gold);
+    text-wrap: balance;
+}
+
+.arel__card-body {
+    margin: calc(4 * var(--fx)) 0 0;
+    font-family: var(--font-body);
+    font-size: max(calc(15 * var(--fx)), 12px);
+    line-height: 1.6;
+    color: rgba(11, 26, 46, 0.72);
+    text-wrap: pretty;
+}
+
+/* ---- mobile (Figma 15:2254): headline, then the cards stacked ---- */
+@media (max-width: 900px) {
+    .arel {
+        padding: calc(24 * var(--fx)) calc(40 * var(--fx)) calc(48 * var(--fx));
+    }
+
+    .arel__lines {
+        width: 260%;
+        left: -60%;
+    }
+
+    .arel__title {
+        font-size: calc(46 * var(--fx));
+        font-weight: 400;
+        font-family: var(--font-display);
+        letter-spacing: 0;
+        line-height: 1.15;
+    }
+
+    .arel__deck {
+        display: none;
+    }
+
+    .arel__grid {
+        margin-top: calc(28 * var(--fx));
+        flex-direction: column;
+        align-items: center;
+        gap: calc(12 * var(--fx));
+    }
+
+    .arel__card {
+        width: 100%;
+        height: auto;
+    }
+
+    .arel__card-inner {
+        position: relative;
+        inset: auto;
+    }
+
+    .arel__face--front {
+        position: relative;
+        min-height: calc(380 * var(--fx));
+        padding: calc(60 * var(--fx)) calc(28 * var(--fx));
+    }
+
+    .arel__face--back {
+        display: none;
+    }
+
+    .arel__card-title {
+        font-size: calc(18 * var(--fx));
+    }
+
+    .arel__card-sub {
+        font-size: calc(12 * var(--fx));
+    }
+
+    .arel__card-body {
+        font-size: calc(14 * var(--fx));
+    }
+}

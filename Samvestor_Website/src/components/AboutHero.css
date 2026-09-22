@@ -121,3 +121,67 @@
     right: 24px;
   }
 }
+
+/* ============================================================
+   About page theme + Figma type (SV About Us 3:3898 light,
+   42:30 dark). --about-ink is the page's text colour: navy on
+   white in light mode, off-white on canvas in dark.
+   ============================================================ */
+:root {
+  --about-ink: var(--primary-50);
+  --about-bg: var(--canvas);
+}
+
+:root[data-theme='light'] {
+  --about-ink: var(--navy-900);
+  --about-bg: var(--white);
+}
+
+.ahero {
+  background: var(--about-bg);
+  text-align: left;
+}
+
+.ahero__brand {
+  font-family: var(--font-body);
+  color: var(--about-ink);
+}
+
+.ahero__text {
+  color: var(--about-ink);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+}
+
+/* the second pair reads as a sentence, not a label */
+.ahero__s3-left,
+.ahero__s3-right {
+  text-transform: none;
+}
+
+:root[data-theme='light'] .ahero--globe .ahero__overlay {
+  background: radial-gradient(
+    115% 115% at 50% 45%,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0) 38%,
+    rgba(255, 255, 255, 0.45) 70%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
+}
+
+/* the wordmark is one tight, heavy word spanning the page (Figma), not
+   letters spread edge to edge */
+.ahero__brand {
+  justify-content: center;
+  padding: 0;
+  bottom: calc(40 * var(--fx));
+  font-size: calc(212 * var(--fx));
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 900px) {
+  .ahero__brand {
+    font-size: calc(58 * var(--fx));
+    bottom: calc(24 * var(--fx));
+  }
+}

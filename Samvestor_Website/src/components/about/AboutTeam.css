@@ -1,0 +1,139 @@
+/* "TEAM" interlude — Figma SV About Us (desktop 1440 frame via --fx) */
+.ateam {
+    position: relative;
+    background: var(--about-bg);
+    color: var(--about-ink);
+    padding: calc(140 * var(--fx)) calc(57 * var(--fx)) calc(120 * var(--fx));
+    overflow: hidden;
+    text-align: left;
+}
+
+.ateam__row {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+/* ---- rulers (measuring-tape ticks) ---- */
+.ateam__ruler {
+    display: flex;
+    align-items: flex-end;
+    gap: calc(8 * var(--fx));
+    height: calc(18 * var(--fx));
+}
+
+.ateam__tick {
+    width: 1px;
+    height: calc(var(--h) * 100%);
+    background: currentColor;
+    opacity: 0.75;
+    transform-origin: 50% 100%;
+}
+
+.ateam__ruler--top {
+    margin-left: calc(400 * var(--fx));
+    margin-bottom: calc(12 * var(--fx));
+}
+
+.ateam__ruler--bottom {
+    margin: calc(90 * var(--fx)) 0 0 calc(400 * var(--fx));
+}
+
+/* ---- dots + TEAM ---- */
+.ateam__heading {
+    display: flex;
+    align-items: center;
+    gap: calc(12 * var(--fx));
+}
+
+.ateam__dots {
+    display: grid;
+    grid-template-columns: repeat(6, auto);
+    gap: calc(4 * var(--fx)) calc(5 * var(--fx));
+}
+
+.ateam__dot {
+    width: calc(2.5 * var(--fx));
+    height: calc(2.5 * var(--fx));
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.8;
+}
+
+.ateam__word {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: max(calc(72 * var(--fx)), 40px);
+    line-height: 1;
+    letter-spacing: 0.55em;
+    /* letter-spacing trails after the last letter — pull it back so the word
+       sits flush right like the design */
+    margin-right: -0.55em;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+/* ---- index + paragraph ---- */
+.ateam__row--copy {
+    margin-top: calc(170 * var(--fx));
+    align-items: flex-start;
+}
+
+.ateam__index {
+    margin-top: calc(130 * var(--fx));
+    font-family: var(--font-body);
+    font-size: max(calc(12 * var(--fx)), 11px);
+    letter-spacing: 0.2em;
+    opacity: 0.85;
+    white-space: pre;
+}
+
+.ateam__copy {
+    margin: 0;
+    max-width: calc(390 * var(--fx));
+    font-family: var(--font-display);
+    font-size: max(calc(16 * var(--fx)), 14px);
+    line-height: 1.35;
+    text-align: right;
+    /* the desktop design sets this paragraph in title case */
+    text-transform: capitalize;
+}
+
+/* ---- mobile (Figma 15:2254, 390 frame) ---- */
+@media (max-width: 900px) {
+    .ateam {
+        padding: calc(40 * var(--fx)) calc(20 * var(--fx)) calc(48 * var(--fx));
+    }
+
+    .ateam__row--top {
+        justify-content: center;
+    }
+
+    .ateam__ruler,
+    .ateam__dots,
+    .ateam__index {
+        display: none;
+    }
+
+    .ateam__word {
+        font-size: calc(60 * var(--fx));
+        letter-spacing: 0;
+        margin-right: 0;
+        font-weight: 400;
+        text-transform: none;
+    }
+
+    .ateam__row--copy {
+        margin-top: calc(180 * var(--fx));
+    }
+
+    .ateam__copy {
+        max-width: none;
+        font-size: calc(17 * var(--fx));
+        line-height: 1.4;
+        text-align: left;
+        text-transform: none;
+    }
+}

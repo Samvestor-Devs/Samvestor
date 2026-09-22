@@ -1,6 +1,6 @@
 .about-page {
   min-height: 100vh;
-  background: #070b12;
+  background: var(--about-bg, #070b12);
 }
 
 .counter {

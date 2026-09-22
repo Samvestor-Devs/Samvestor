@@ -1,0 +1,99 @@
+/* Founder story — Figma SV About Us (desktop 1440 via --fx) */
+.astory {
+    background: var(--about-bg);
+    color: var(--about-ink);
+    padding: calc(100 * var(--fx)) calc(84 * var(--fx)) calc(130 * var(--fx));
+    display: grid;
+    grid-template-columns: calc(500 * var(--fx)) minmax(0, 1fr);
+    gap: calc(64 * var(--fx));
+    align-items: start;
+}
+
+.astory__figure {
+    margin: 0;
+    position: sticky;
+    top: calc(110 * var(--fx));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(18 * var(--fx));
+}
+
+.astory__media {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #d4b86a;
+}
+
+.astory__photo {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    will-change: transform;
+}
+
+.astory__photo--placeholder {
+    background: #d4b86a; /* the design's gold panel until the photo is added */
+}
+
+.astory__caption {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: max(calc(20 * var(--fx)), 16px);
+}
+
+.astory__text {
+    display: flex;
+    flex-direction: column;
+    gap: calc(14 * var(--fx));
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: max(calc(16 * var(--fx)), 14px);
+    line-height: 1.75;
+}
+
+.astory__text p,
+.astory__quote {
+    margin: 0;
+}
+
+.astory__title {
+    margin: 0 0 calc(10 * var(--fx));
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: max(calc(24 * var(--fx)), 20px);
+    line-height: 1.2;
+}
+
+.astory__quote {
+    font-size: max(calc(19 * var(--fx)), 16px);
+    font-style: italic;
+    color: var(--gold);
+}
+
+.astory__sign {
+    margin-top: calc(16 * var(--fx)) !important;
+    font-weight: 600;
+}
+
+/* ---- mobile ---- */
+@media (max-width: 900px) {
+    .astory {
+        grid-template-columns: 1fr;
+        padding: calc(32 * var(--fx)) calc(20 * var(--fx)) calc(48 * var(--fx));
+        gap: calc(28 * var(--fx));
+    }
+
+    .astory__figure {
+        position: static;
+    }
+
+    .astory__text {
+        font-size: calc(13 * var(--fx));
+        line-height: 1.7;
+        gap: calc(10 * var(--fx));
+    }
+}
