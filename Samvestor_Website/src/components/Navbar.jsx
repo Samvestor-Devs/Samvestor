@@ -137,7 +137,7 @@ function Navbar() {
     return (
         <>
             <nav
-                className={`navbar-container ${scrolled ? 'scrolled' : ''} ${
+                className={`navbar-container ${scrolled ? 'scrolled' : ''} ${mobileOpen ? 'menu-open' : ''} ${
                     hidden && !mobileOpen ? 'navbar-container--hidden' : ''
                 }`}
                 // tabbing into a hidden navbar brings it back
@@ -179,11 +179,14 @@ function Navbar() {
                         <span className="cta-label">{ctaLink.label}</span>
                     </Link>
 
+                    <ThemeToggle className="navbar-theme-toggle-mobile" />
+
                     <button
                         className={`mobile-toggle ${mobileOpen ? 'active' : ''}`}
                         id="mobileToggle"
                         type="button"
-                        aria-label="Toggle navigation"
+                        aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                        aria-controls="mobileMenu"
                         aria-expanded={mobileOpen}
                         onClick={toggleMobileMenu}
                     >
@@ -201,57 +204,46 @@ function Navbar() {
                 onClick={closeMobileMenu}
             />
 
-            <div className={`mobile-menu ${mobileOpen ? 'active' : ''}`} id="mobileMenu" aria-hidden={!mobileOpen}>
-                <div className="mobile-menu-header">
-                    <Link
-                        href={toHref('#home', pathname)}
-                        className="mobile-menu-brand"
-                        onClick={(event) => handleNavigationClick(event, '#home')}
-                    >
-                        <img className="brand-logo" src={logoWhite} alt="SamVestor" />
-                    </Link>
-                    <button
-                        className="mobile-menu-close"
-                        type="button"
-                        id="mobileMenuClose"
-                        aria-label="Close menu"
-                        onClick={closeMobileMenu}
-                    >
-                        ×
-                    </button>
-                </div>
+            <div
+                className={`mobile-menu ${mobileOpen ? 'active' : ''}`}
+                id="mobileMenu"
+                aria-hidden={!mobileOpen}
+                inert={!mobileOpen}
+            >
+                <nav className="mobile-menu-inner" aria-label="Menu">
+                    <ul className="mobile-menu-nav">
+                        {navItems.map((item, i) => (
+                            <li className="mobile-menu-item" key={item.id} style={{ '--i': i }}>
+                                <Link
+                                    href={toHref(item.href, pathname)}
+                                    className={`mobile-menu-link ${isActive(item.href) ? 'active' : ''}`}
+                                    aria-current={isActive(item.href) ? 'page' : undefined}
+                                    onClick={(event) => handleNavigationClick(event, item.href)}
+                                >
+                                    <span className="mobile-menu-index">{String(i + 1).padStart(2, '0')}</span>
+                                    <span className="mobile-menu-label">{item.label}</span>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
 
-                <ul className="mobile-menu-nav">
-                    {navItems.map((item) => (
-                        <li className="mobile-menu-item" key={item.id}>
-                            <Link
-                                href={toHref(item.href, pathname)}
-                                className={`mobile-menu-link ${isActive(item.href) ? 'active' : ''}`}
-                                onClick={(event) => handleNavigationClick(event, item.href)}
-                            >
-                                <span>{item.label}</span>
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-
-                <div className="mobile-theme-row">
-                    <span className="mobile-theme-label">Light / dark mode</span>
-                    <ThemeToggle />
-                </div>
-
-                <div className="mobile-cta">
-                    <Link
-                        href={toHref(ctaLink.href, pathname)}
-                        className="cta-button mobile-cta-button"
-                        onClick={(event) => handleNavigationClick(event, ctaLink.href, true)}
-                    >
-                        <span className="cta-icon">
-                            <PhoneIcon />
-                        </span>
-                        <span className="cta-label">{ctaLink.label}</span>
-                    </Link>
-                </div>
+                    <div className="mobile-menu-footer" style={{ '--i': navItems.length }}>
+                        <Link
+                            href={toHref(ctaLink.href, pathname)}
+                            className="cta-button mobile-cta-button"
+                            onClick={(event) => handleNavigationClick(event, ctaLink.href, true)}
+                        >
+                            <span className="cta-icon">
+                                <PhoneIcon />
+                            </span>
+                            <span className="cta-label">{ctaLink.label}</span>
+                        </Link>
+                        <div className="mobile-menu-contact">
+                            <a href="mailto:samvestor@gmail.com">samvestor@gmail.com</a>
+                            <a href="tel:+917996600003">079966 00003</a>
+                        </div>
+                    </div>
+                </nav>
             </div>
         </>
     );

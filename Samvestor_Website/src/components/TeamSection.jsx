@@ -7,21 +7,40 @@ import './TeamSection.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// flowing background line — ONE continuous "pigtail" stroke (viewBox 2000 x 1288):
-// enters top-left -> single clean loop on the left (one crossover at its top)
-// -> flows straight out into the S-wave (trough, crest) -> tail off bottom-right
-const LINE_PATH =
-  'M 20 60 ' +
-  'C 200 200, 400 380, 510 470 ' + // enter from top-left, down toward the loop
-  'C 560 510, 575 560, 540 620 ' + // short right shoulder of the loop
-  'C 480 730, 320 800, 190 740 ' + // bottom of the loop
-  'C 70 685, 60 540, 170 480 ' + // up the left side of the loop
-  'C 250 440, 360 445, 460 475 ' + // over the top, crossing the entry once
-  'C 620 520, 760 560, 980 600 ' + // flow straight out to the right
-  'C 1180 635, 1250 760, 1340 805 ' + // dip into the trough
-  'C 1470 860, 1600 700, 1730 665 ' + // rise to the crest
-  'C 1840 645, 1895 850, 1925 1030 ' + // roll over the crest, heading down
-  'C 1948 1155, 1965 1230, 1995 1285'; // tail off the bottom-right
+// flowing background line — Figma draws it as two vectors; here they are
+// joined into ONE continuous stroke that follows the same path.
+// Coordinates are Figma px of the section frame, so the viewBox matches it.
+
+// desktop (148:179, 1440 x 1197): enters off-screen top-left, dives under the
+// small image (where the two Figma vectors meet), loops out past its left
+// edge, then waves right and leaves off the right edge
+const LINE_DESKTOP = {
+  viewBox: '0 0 1440 1197',
+  width: 37,
+  d:
+    'M -8.5 25.1 ' +
+    'C 116 41.4, 377.5 152.6, 393.5 457 ' + // Figma "Vector 1"
+    'C 395 495, 380 540, 348.5 563.1 ' + // hidden under the image: the join
+    'C 279.7 646.3, 220.5 633.3, 171.5 628.6 ' + // Figma "Vector 2" from here
+    'C -8 611.6, 58 305.1, 384 288.1 ' +
+    'C 710 271.1, 860.5 858.3, 1077 550.1 ' +
+    'C 1151.5 425.5, 1312.9 467.5, 1308 599.6 ' +
+    'C 1299 841, 1544 908.5, 1544 915.1',
+};
+
+// mobile (153:2949, 390 wide): the two Figma vectors already meet end to end
+const LINE_MOBILE = {
+  viewBox: '0 0 390 520',
+  width: 35,
+  d:
+    'M -42.5 3.9 ' +
+    'C 64.8 42.9, 330 179.4, 273.5 380.9 ' + // Figma "Vector 3"
+    'C 237.5 486.9, 158.5 500.4, 95 494.4 ' +
+    'C -13 486.8, -45.5 302.4, 133 227.4 ' + // Figma "Vector 4"
+    // Figma runs on to x625; trimmed (same curve) to just past the 390 edge
+    // so none of the scroll-drawn length happens off-screen
+    'C 228.8 187.1, 329.2 218.9, 420 270.2',
+};
 
 // swap these for your real images
 const SMALL_IMG =
@@ -31,26 +50,33 @@ const BIG_IMG =
 
 function TeamSection() {
   const sectionRef = useRef(null);
-  const pathRef = useRef(null);
+  const lineRefs = useRef([]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const path = pathRef.current;
+      lineRefs.current.forEach((path) => {
+      if (!path) return;
       const length = path.getTotalLength();
 
       // start fully hidden (line "un-drawn")
       gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
 
-      // draw it as the section scrolls: left end -> right end
+      // draw it as the section scrolls: start -> end
       gsap.to(path, {
         strokeDashoffset: 0,
         ease: 'none',
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 80%', // begins as the section enters the viewport
-          end: 'bottom 20%', // finishes near the end of the section
+          // begins once the section is well on screen, so the growing tip
+          // stays visible even as it dips around the bottom of the loop
+          start: 'top 40%',
+          // finishes as the section's bottom comes into view, so the line's
+          // end is drawn while it's on screen (was 'bottom 20%' — too slow,
+          // it finished after scrolling out of view)
+          end: 'bottom 90%',
           scrub: true,
         },
+      });
       });
     }, sectionRef);
 
@@ -59,28 +85,38 @@ function TeamSection() {
 
   return (
     <section className="team" ref={sectionRef}>
-      <svg
-        className="team__line"
-        viewBox="0 0 2000 1288"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <defs>
-          <linearGradient id="teamLineGradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#4a6fa5" />
-            <stop offset="100%" stopColor="#2e4f80" />
-          </linearGradient>
-        </defs>
-        <path
-          ref={pathRef}
-          d={LINE_PATH}
-          fill="none"
-          stroke="url(#teamLineGradient)"
-          strokeWidth="26"
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
+      {[LINE_DESKTOP, LINE_MOBILE].map((line, i) => (
+        <svg
+          key={line.viewBox}
+          className={`team__line ${i === 0 ? 'team__line--desktop' : 'team__line--mobile'}`}
+          viewBox={line.viewBox}
+          aria-hidden="true"
+        >
+          <defs>
+            {/* Figma: the entering stretch is Primary-500, the loop and wave
+                Primary-400 — blended into one stroke */}
+            <linearGradient
+              id={`teamLineGradient${i}`}
+              gradientUnits="userSpaceOnUse"
+              x1="0"
+              y1="0"
+              x2={i === 0 ? 420 : 300}
+              y2={i === 0 ? 470 : 380}
+            >
+              <stop offset="0%" stopColor="#2e4f80" />
+              <stop offset="100%" stopColor="#4a6fa5" />
+            </linearGradient>
+          </defs>
+          <path
+            ref={(el) => (lineRefs.current[i] = el)}
+            d={line.d}
+            fill="none"
+            stroke={`url(#teamLineGradient${i})`}
+            strokeWidth={line.width}
+            strokeLinecap="round"
+          />
+        </svg>
+      ))}
 
       <div className="team__inner">
         <div className="team__top">
