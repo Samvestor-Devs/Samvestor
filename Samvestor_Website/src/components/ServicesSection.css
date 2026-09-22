@@ -3,3 +3,23 @@
   width: 100%;
   /* native cursor stays here — the custom circle belongs to WorkSection only */
 }
+
+/* desktop: give the last card one more screen of scroll to stay pinned on,
+   and pull the next section (Blueprint) up by the same amount so it slides
+   over that card — just like each card slides over the previous one, which
+   is what drives the "falling back" recede in ServicesSection.jsx */
+@media (min-width: 901px) {
+  /* a spacer, not padding: sticky panels stop at the content edge, so
+     padding wouldn't extend how long the last card stays pinned */
+  .services::after {
+    content: '';
+    display: block;
+    height: 100vh;
+  }
+
+  .services + .blueprint {
+    position: relative;
+    z-index: 1;
+    margin-top: -100vh;
+  }
+}

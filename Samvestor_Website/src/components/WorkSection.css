@@ -97,3 +97,15 @@
 :root[data-theme='light'] .work-section {
   background: var(--theme-raised);
 }
+
+/* ---- desktop spacing per the full-page Figma: 30px from the last row to
+   Discover More, 28px below it ---- */
+@media (min-width: 901px) {
+  .work-section {
+    padding-bottom: calc(28 * var(--fx));
+  }
+
+  .work-section__cta {
+    margin-top: calc(30 * var(--fx));
+  }
+}

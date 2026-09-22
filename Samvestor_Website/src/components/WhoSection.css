@@ -78,6 +78,7 @@
 }
 
 .who__card {
+  text-align: left; /* #root centres text globally — card copy is left-aligned */
   position: absolute;
   width: calc(314 * var(--fs));
   height: calc(419 * var(--fs));

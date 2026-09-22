@@ -1,5 +1,6 @@
 'use client';
 
+import { Fragment } from 'react';
 import './ServicePanel.css';
 
 /**
@@ -27,7 +28,16 @@ function ServicePanel({ number, title, paragraphs, image, bg, light = {}, accent
           <h2 className="panel__title">
             {title.split('\n').map((line, i) => (
               <span key={i} className="panel__title-line">
-                {line}
+                {line.split('|').map((part, j, parts) =>
+                  j < parts.length - 1 ? (
+                    <Fragment key={j}>
+                      {part}{' '}
+                      <br className="panel__title-br" />
+                    </Fragment>
+                  ) : (
+                    part
+                  )
+                )}
               </span>
             ))}
           </h2>
@@ -56,7 +66,7 @@ function ServicePanel({ number, title, paragraphs, image, bg, light = {}, accent
             <img
               className="panel__img"
               src={image}
-              alt={title.replace('\n', ' ')}
+              alt={title.replace(/[\n|]/g, ' ')}
             />
           </div>
         </div>

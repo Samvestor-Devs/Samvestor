@@ -184,3 +184,17 @@
 :root[data-theme='light'] .hero__paragraph {
     color: var(--theme-ink);
 }
+
+/* ---- desktop spacing per the full-page Figma (148:2 / 153:1195): the
+   headline sits 38px under the navbar, and the paragraph ends above the
+   CTA instead of sharing its baseline. The hero itself stays a full
+   screen tall on purpose (video background). ---- */
+@media (min-width: 901px) {
+    .hero__content {
+        padding-top: calc(120 * var(--fx));
+    }
+
+    .hero__paragraph {
+        margin-bottom: calc(56 * var(--fx));
+    }
+}

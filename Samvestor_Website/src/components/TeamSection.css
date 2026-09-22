@@ -30,6 +30,7 @@
 }
 
 .team__title {
+  text-align: left; /* #root centres text globally */
   margin: 0;
   flex-shrink: 0;
   max-width: calc(520 * var(--fx));
@@ -163,4 +164,39 @@
 :root[data-theme='light'] .team__title,
 :root[data-theme='light'] .team__intro {
   color: var(--theme-ink);
+}
+
+/* ---- desktop layout + spacing per the full-page Figma: the title is one
+   line indented to x140, the intro sits under it on the right, then
+   22px to the image/CTA row, 74px to the big image and 20px below it ---- */
+@media (min-width: 901px) {
+  .team__inner {
+    padding-bottom: 0;
+  }
+
+  .team__top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .team__title {
+    max-width: none;
+    margin-left: calc(70 * var(--fx));
+    white-space: nowrap;
+  }
+
+  .team__intro {
+    align-self: flex-end;
+    max-width: calc(725 * var(--fx));
+    margin-top: calc(61 * var(--fx));
+  }
+
+  .team__cards {
+    margin-top: calc(22 * var(--fx));
+  }
+
+  .team__card-big {
+    margin-top: calc(74 * var(--fx));
+  }
 }

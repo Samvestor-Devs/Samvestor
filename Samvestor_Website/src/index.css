@@ -32,14 +32,15 @@
   /* fluid scale — desktop Figma frame is 1440 wide */
   --fx: calc(100vw / 1440);
 
-  /* bottom edge of the fixed navbar (24 offset + 80 bar on the 1440 frame);
-     pinned full-screen sections keep their content below this line */
-  --nav-safe: calc(104 * var(--fx));
+  /* space pinned full-screen sections reserve at the top for the navbar.
+     0: the navbar hides while scrolling down (Navbar.jsx), so sections use
+     the whole screen like the Figma frames; it only returns on scroll-up. */
+  --nav-safe: 0px;
 
   /* "fit" scale for pinned full-screen sections: the same as --fx on
      normal screens, but it also shrinks on short / ultrawide viewports so
-     the whole composition always fits under the navbar. 796 is the
-     1440x900 frame's height below the navbar. */
+     the whole composition always fits. 796 is the composition's height on
+     the 1440 frame. */
   --fs: min(var(--fx), calc((100vh - var(--nav-safe)) / 796));
 }
 
@@ -70,12 +71,6 @@
   transition-timing-function: ease !important;
 }
 
-/* hamburger navbar: 20px offset + 68px bar */
-@media (max-width: 992px) {
-  :root {
-    --nav-safe: 88px;
-  }
-}
 
 /* mobile Figma frame is 390 wide (kept in sync with the sections'
    900px layout breakpoint) */

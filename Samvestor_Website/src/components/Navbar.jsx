@@ -72,6 +72,38 @@ function Navbar() {
         document.body.style.overflow = mobileOpen ? 'hidden' : '';
     }, [mobileOpen]);
 
+    // hide while scrolling down, bring back on any scroll up (and always at
+    // the top of the page) — the sections then get the whole screen
+    const [hidden, setHidden] = useState(false);
+    useEffect(() => {
+        const TOP_ZONE = 80; // px from the top where it always shows
+        const THRESHOLD = 6; // ignore tiny jitters (trackpads, rubber-banding)
+        let lastY = window.scrollY;
+        let raf = 0;
+
+        const update = () => {
+            raf = 0;
+            const y = window.scrollY;
+            const dy = y - lastY;
+            if (y < TOP_ZONE) {
+                setHidden(false);
+                lastY = y;
+            } else if (Math.abs(dy) > THRESHOLD) {
+                setHidden(dy > 0);
+                lastY = y;
+            }
+        };
+        const onScroll = () => {
+            if (!raf) raf = requestAnimationFrame(update);
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+            if (raf) cancelAnimationFrame(raf);
+        };
+    }, []);
+
     const closeMobileMenu = () => setMobileOpen(false);
     const toggleMobileMenu = () => setMobileOpen((prev) => !prev);
 
@@ -104,7 +136,13 @@ function Navbar() {
 
     return (
         <>
-            <nav className={`navbar-container ${scrolled ? 'scrolled' : ''}`}>
+            <nav
+                className={`navbar-container ${scrolled ? 'scrolled' : ''} ${
+                    hidden && !mobileOpen ? 'navbar-container--hidden' : ''
+                }`}
+                // tabbing into a hidden navbar brings it back
+                onFocus={() => setHidden(false)}
+            >
                 <div className="navbar">
                     <Link
                         href={toHref('#home', pathname)}

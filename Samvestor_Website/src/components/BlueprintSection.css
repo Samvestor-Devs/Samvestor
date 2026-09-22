@@ -201,3 +201,27 @@
 :root[data-theme='light'] .blueprint__heading-mobile {
     color: var(--theme-ink);
 }
+
+/* ---- desktop spacing per the full-page Figma: 50px above the pitch, 48px
+   between the button and the image, the vertical heading bottoming out
+   35px below the image, 199px down to Book a Demo and 32px under it ---- */
+@media (min-width: 901px) {
+    .blueprint__inner {
+        align-items: flex-end;
+        padding-top: calc(50 * var(--fx));
+        padding-bottom: 0;
+    }
+
+    .blueprint__media {
+        margin-top: calc(48 * var(--fx));
+    }
+
+    .blueprint__heading {
+        margin-bottom: calc(-35 * var(--fx));
+    }
+
+    .blueprint__demo-row {
+        padding-top: calc(199 * var(--fx));
+        padding-bottom: calc(32 * var(--fx));
+    }
+}

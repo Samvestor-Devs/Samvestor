@@ -15,7 +15,8 @@ const PLACEHOLDER =
 /**
  * Each entry becomes one stacking panel.
  *  - number    : "01" .. "06"
- *  - title     : big heading (supports \n for a line break)
+ *  - title     : big heading — '\n' breaks the line everywhere, '|' only
+ *                on desktop (matches the Figma line breaks; phones wrap naturally)
  *  - paragraphs: array of body paragraphs
  *  - image     : right-side image
  *  - bg        : panel background colour
@@ -37,7 +38,7 @@ const SERVICES = [
   },
   {
     number: '02',
-    title: 'Content & Copywriting',
+    title: 'Content &|Copywriting',
     paragraphs: [
       'We write the words that do the actual selling - hooks that stop the scroll, ads that pull people in, emails that get opened and landing pages that turn visitors into buyers. Every single word is written with one goal in mind - to make the person reading it take action. Not to sound good. Not to fill space. To sell.',
       'Good copy is not about being clever. It is about understanding exactly what your customer is thinking, meeting them where they are and giving them a clear reason to buy. We dig into your brand, your audience and your product before we write a single line - because strategy-backed words always outperform words written on instinct.',
@@ -49,7 +50,7 @@ const SERVICES = [
   },
   {
     number: '03',
-    title: 'Email & WhatsApp Marketing',
+    title: 'Email & WhatsApp|Marketing',
     paragraphs: [
       'Your customers are already on WhatsApp and email every single day - the only question is whether they are hearing from you or from your competitor. Most brands either do not show up at all or send messages so generic that people stop opening them after the first week. That is where most of the revenue gets left on the table, and most brands never even realise it.',
       'We build campaigns and flows that feel like they were written for one person, not blasted to a list of thousands. From the first welcome message to the re-engagement sequence that brings lost customers back, every single touchpoint is designed to feel personal, timely and worth reading. The result is simple - more opens, more clicks and more purchases from the audience you have already worked hard to build.',
@@ -73,7 +74,7 @@ const SERVICES = [
   },
   {
     number: '05',
-    title: 'Video Editing',
+    title: 'Video|Editing',
     paragraphs: [
       'We cut, pace and structure every video with one thing in mind - keeping the person watching until the very last second. In a world where someone can swipe away in under two seconds, every frame has to earn its place. The first second hooks them in, the middle builds the case and the final call-to-action tells them exactly what to do next.',
       'Every video we produce is built specifically for the platform it lives on - because a video that works on TikTok is structured completely differently from one that converts on YouTube or Meta. We understand the nuances of each platform, the attention patterns of each audience and the creative triggers that turn a viewer into a buyer.',
@@ -85,7 +86,7 @@ const SERVICES = [
   },
   {
     number: '06',
-    title: 'CRO & Funnel Optimization',
+    title: 'CRO & Funnel|Optimization',
     paragraphs: [
       'Getting traffic is the easy part - almost any agency can run ads and send people to your website. What happens after that click is where most brands quietly lose money every single day without realising it. A slow loading page, a confusing layout, a checkout with one too many steps - any one of these can kill a sale that was already halfway done.',
       'We go through every single step of your user journey with a fine tooth comb - from the moment someone lands on your page to the moment they complete a purchase. We test, refine and optimise everything in between. Because when your funnel is tight, every rupee you spend on traffic works harder, your cost per acquisition drops and the revenue you were always capable of generating finally starts to show up in your bank account.',
@@ -110,7 +111,8 @@ function ServicesSection() {
       const panels = gsap.utils.toArray('.panel', sectionRef.current);
 
       panels.forEach((panel, i) => {
-        if (i === panels.length - 1) return; // last panel stays flat
+        // the last panel recedes too: the Blueprint section slides over it
+        // the same way the next card would (see ServicesSection.css)
 
         const card = panel.querySelector('.panel__card');
         const overlay = panel.querySelector('.panel__overlay');

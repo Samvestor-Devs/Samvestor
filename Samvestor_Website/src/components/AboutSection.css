@@ -12,8 +12,8 @@
   height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center;
-  /* centre the text in the space below the fixed navbar */
+  /* vertically centred, but hugging the left edge like the Figma (x28) */
+  justify-content: flex-start;
   padding: var(--nav-safe) calc(28 * var(--fx)) 0;
   box-sizing: border-box;
   overflow: hidden;

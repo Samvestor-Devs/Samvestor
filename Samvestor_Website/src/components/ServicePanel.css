@@ -2,13 +2,12 @@
    Service panel — styled EXACTLY to the Figma (desktop 153:956,
    mobile 153:3201).
 
-   Desktop: every card fills exactly one screen (full-bleed width and
-   height). The Figma 1440x800 card is laid out as an "artboard" inside
-   it, scaled to fit both the screen width and the space below the navbar,
-   and centred — so the title is never cut off or hidden under the navbar
-   and the space below the image is kept, on any desktop aspect ratio.
-   Sizes are  max(calc(N * var(--pu)), floor)  where --pu is one Figma px
-   of that artboard.
+   Desktop: every card fills exactly one screen. The Figma card layout
+   always spans the full width (no side gutters): horizontal sizes use
+   --su (one Figma px of the screen width), while type and vertical
+   spacing use --pu, which also shrinks on short / wide screens so the
+   title stays clear of the navbar. The image takes whatever height is
+   left, so the card is filled top to bottom on any aspect ratio.
 
    Mobile: sizes are  max(calc(N / 390 * 100cqw), floor).
    ============================================================ */
@@ -24,6 +23,8 @@
   background: var(--canvas);
   perspective: 1600px;
   overflow: hidden;
+  /* #root centres text globally — the cards are left-aligned per the design */
+  text-align: left;
 }
 
 /* the inner card is the full-bleed visual that actually animates */
@@ -31,14 +32,15 @@
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  /* keep the artboard clear of the fixed navbar */
+  flex-direction: column;
+  /* keep the content clear of the fixed navbar */
   padding-top: var(--nav-safe);
   box-sizing: border-box;
-  /* one Figma px of the 1440x800 artboard: the largest scale that fits both
-     the card width and the height left below the navbar */
-  --pu: min(calc(100cqw / 1440), calc((100cqh - var(--nav-safe)) / 800));
+  /* --su: one Figma px of the screen width (widths, side padding)
+     --pu: one Figma px for type and vertical spacing — the same as --su,
+           but smaller when the height left under the navbar is short */
+  --su: calc(100cqw / 1440);
+  --pu: min(var(--su), calc((100cqh - var(--nav-safe)) / 800));
   transform-origin: center center;
   will-change: transform;
   transform: translateZ(0);
@@ -56,14 +58,13 @@
   z-index: 2;
 }
 
-/* the 1440x800 artboard — content sits at the top, leaving the design's
-   space below the image */
+/* the card content: full width, filling the height under the navbar */
 .panel__inner {
-  width: calc(1440 * var(--pu));
-  height: calc(800 * var(--pu));
-  flex-shrink: 0;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
   box-sizing: border-box;
-  padding: max(calc(20 * var(--pu)), 13px) max(calc(16 * var(--pu)), 10px);
+  padding: max(calc(20 * var(--pu)), 13px) max(calc(16 * var(--su)), 10px);
   display: flex;
   flex-direction: column;
   gap: max(calc(32 * var(--pu)), 20px);
@@ -109,9 +110,12 @@
 /* ---- content row: text column + image ---- */
 .panel__body {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   justify-content: center;
-  gap: max(calc(12 * var(--pu)), 8px);
+  /* takes the rest of the card; the image fills its height */
+  flex: 1;
+  min-height: 0;
+  gap: max(calc(12 * var(--su)), 8px);
   padding-top: max(calc(13 * var(--pu)), 8px);
   border-top: 1px solid #9d9d9d;
 }
@@ -121,8 +125,9 @@
   flex-direction: column;
   align-items: flex-end; /* button sits to the right, matching the design */
   gap: max(calc(13 * var(--pu)), 8px);
-  width: calc(767 * var(--pu));
+  width: calc(767 * var(--su));
   flex-shrink: 0;
+  align-self: flex-start;
 }
 
 /* the two paragraphs read as one continuous block (no inter-paragraph gap),
@@ -185,8 +190,10 @@
 
 /* ---- image ---- */
 .panel__media {
-  width: calc(553.564 * var(--pu));
-  aspect-ratio: 552.58 / 420.17;
+  width: calc(553.564 * var(--su));
+  /* fills the height left in the card (cropping via object-fit), capped at
+     a square so very tall screens don't get a tower */
+  max-height: calc(553.564 * var(--su));
   border-radius: max(calc(12 * var(--pu)), 7px);
   overflow: hidden;
   flex-shrink: 0;
@@ -239,6 +246,12 @@
     gap: max(calc(12 / 390 * 100cqw), 10px);
   }
 
+  /* the desktop-only Figma line breaks ('|' in the titles) — phones wrap
+     naturally */
+  .panel__title-br {
+    display: none;
+  }
+
   .panel__copy {
     padding-bottom: max(calc(22 / 390 * 100cqw), 14px);
   }
@@ -285,6 +298,8 @@
   .panel__media {
     width: 100%;
     max-width: 100%;
+    max-height: none;
+    align-self: auto;
     aspect-ratio: 349.97 / 238.69;
     border-radius: max(calc(12 / 390 * 100cqw), 11px);
   }

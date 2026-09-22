@@ -122,6 +122,7 @@
 }
 
 .process__item {
+  text-align: left; /* #root centres text globally — steps are left-aligned */
   display: flex;
   flex-direction: column;
   gap: calc(6 * var(--fx));
@@ -258,4 +259,14 @@
 /* light theme: this band stays navy (Figma raised surface) */
 :root[data-theme='light'] .process {
   background: var(--theme-raised);
+}
+
+/* ---- desktop spacing per the full-page Figma: 20px above the eyebrow and
+   below the CTA (the 40px hold under the last step is intentional — it
+   keeps the image pinned while the gold bar finishes) ---- */
+@media (min-width: 901px) {
+  .process {
+    padding-top: calc(20 * var(--fx));
+    padding-bottom: calc(20 * var(--fx));
+  }
 }
