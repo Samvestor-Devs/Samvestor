@@ -308,24 +308,22 @@
         gap: calc(12 * var(--fx));
     }
 
+    /* phones flip each card over as it scrolls fully into view, so the card
+       keeps a fixed size and both faces stay stacked on top of each other */
     .arel__card {
         width: 100%;
-        height: auto;
-    }
-
-    .arel__card-inner {
-        position: relative;
-        inset: auto;
+        height: calc(430 * var(--fx));
+        /* the depth is set on the card itself by GSAP (transformPerspective),
+           so no perspective here — the two would compound and exaggerate the
+           stretch halfway through the turn */
     }
 
     .arel__face--front {
-        position: relative;
-        min-height: calc(380 * var(--fx));
-        padding: calc(60 * var(--fx)) calc(28 * var(--fx));
+        padding: calc(52 * var(--fx)) calc(26 * var(--fx));
     }
 
     .arel__face--back {
-        display: none;
+        border-width: calc(8 * var(--fx));
     }
 
     .arel__card-title {

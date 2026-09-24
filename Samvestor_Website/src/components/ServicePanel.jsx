@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useId, useState } from 'react';
+import { Fragment, useId, useLayoutEffect, useRef, useState } from 'react';
 import './ServicePanel.css';
 
 /**
@@ -14,9 +14,35 @@ function ServicePanel({ number, title, paragraphs, image, bg, light = {}, accent
   // under 900px and leaves the copy fully open above it.
   const [open, setOpen] = useState(false);
   const copyId = useId();
+  const articleRef = useRef(null);
+  const anchorRef = useRef(null);
+
+  // remember where the card sits on screen before the toggle, so the jump
+  // below can be undone
+  const toggle = () => {
+    anchorRef.current = articleRef.current?.getBoundingClientRect().top ?? null;
+    setOpen((v) => !v);
+  };
+
+  useLayoutEffect(() => {
+    const el = articleRef.current;
+    if (!el || anchorRef.current === null) return;
+
+    // opening un-pins the card (see the CSS), so a card that was stuck to the
+    // top of the screen snaps down to its place in the flow — on a phone that
+    // threw the heading right off screen. Scroll by the same amount to keep
+    // the card exactly where the reader left it.
+    const drift = el.getBoundingClientRect().top - anchorRef.current;
+    if (drift) window.scrollBy(0, drift);
+    anchorRef.current = null;
+
+    // the page just grew or shrank by a few hundred pixels, so every scroll
+    // position measured below this card is now wrong
+    window.dispatchEvent(new CustomEvent('sv:panel-toggle'));
+  }, [open]);
 
   return (
-    <article className={`panel${open ? ' panel--open' : ''}`}>
+    <article className={`panel${open ? ' panel--open' : ''}`} ref={articleRef}>
       {/* the inner card is what gets the 3D transform — keeping it off the
           sticky element avoids the pin/unpin jump */}
       <div
@@ -68,7 +94,7 @@ function ServicePanel({ number, title, paragraphs, image, bg, light = {}, accent
               className="panel__more"
               aria-expanded={open}
               aria-controls={copyId}
-              onClick={() => setOpen((v) => !v)}
+              onClick={toggle}
             >
               {open ? 'Read less' : 'Read more'}
             </button>

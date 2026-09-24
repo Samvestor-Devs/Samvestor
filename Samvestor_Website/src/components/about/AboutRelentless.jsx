@@ -160,17 +160,35 @@ function AboutRelentless() {
                 });
             });
 
-            // phones: each card rises in as it arrives
+            // phones: every card starts face-down and turns over as you
+            // scroll, finishing while the whole card is on screen
             mm.add('(max-width: 900px)', () => {
                 q('.arel__card-inner').forEach((card) => {
-                    gsap.from(card, {
-                        y: 60,
-                        rotation: -3,
-                        autoAlpha: 0,
-                        duration: 0.9,
-                        ease: 'expo.out',
-                        scrollTrigger: { trigger: card, start: 'top 90%', once: true },
-                    });
+                    gsap.fromTo(
+                        card,
+                        {
+                            rotationY: 180,
+                            // the SAME perspective at both ends — set on only
+                            // one side, GSAP animates it up from 0 and the
+                            // card balloons mid-turn. A distant one (2400)
+                            // keeps the halfway stretch gentle.
+                            transformPerspective: 2400,
+                        },
+                        {
+                            rotationY: 0,
+                            transformPerspective: 2400,
+                            ease: 'none',
+                            scrollTrigger: {
+                                trigger: card.parentElement,
+                                start: 'top 88%', // the card's top edge appears
+                                // done by the time its bottom clears the fold,
+                                // so the turn always finishes in full view
+                                end: 'bottom 94%',
+                                scrub: 0.6,
+                                invalidateOnRefresh: true,
+                            },
+                        }
+                    );
                 });
             });
         }, sectionRef);
