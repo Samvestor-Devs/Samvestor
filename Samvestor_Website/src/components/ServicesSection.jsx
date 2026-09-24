@@ -104,17 +104,6 @@ function ServicesSection() {
   // 3D recede: as the NEXT panel scrolls up to the top 25% line, the current
   // (underneath) panel tilts back / scales down in 3D, sinking into the stack.
   useEffect(() => {
-    // a card's "Read more" changes the page height, which moves every scroll
-    // position below it — remeasure (twice: once now, once after the copy has
-    // finished its 0.45s open/close transition)
-    let settle = 0;
-    const onToggle = () => {
-      ScrollTrigger.refresh();
-      clearTimeout(settle);
-      settle = setTimeout(() => ScrollTrigger.refresh(), 520);
-    };
-    window.addEventListener('sv:panel-toggle', onToggle);
-
     const ctx = gsap.context(() => {
       // desktop only — no 3D recede / dimming on phones (panels just stack)
       const mm = gsap.matchMedia();
@@ -216,11 +205,7 @@ function ServicesSection() {
       });
     }, sectionRef);
 
-    return () => {
-      window.removeEventListener('sv:panel-toggle', onToggle);
-      clearTimeout(settle);
-      ctx.revert();
-    };
+    return () => ctx.revert();
   }, []);
 
   return (

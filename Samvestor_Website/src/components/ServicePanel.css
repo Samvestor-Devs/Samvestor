@@ -221,15 +221,176 @@
 }
 
 /* ============================================================
+   READ-MORE SHEET (phones) — the full copy slides up over the
+   page instead of growing the card. Rendered on <body>.
+   ============================================================ */
+.panel-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 1900; /* over the navbar and its menu */
+    display: flex;
+    align-items: flex-end;
+}
+
+.panel-sheet__scrim {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    padding: 0;
+    background: rgba(3, 7, 14, 0.62);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: panel-sheet-fade 0.3s ease both;
+}
+
+.panel-sheet__card {
+    position: relative;
+    width: 100%;
+    max-height: 92vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+    border-radius: 20px 20px 0 0;
+    background: var(--panel-bg);
+    color: var(--white);
+    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.45);
+    animation: panel-sheet-rise 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+:root[data-theme='light'] .panel-sheet__card {
+    background: var(--panel-bg-light, var(--panel-bg));
+}
+
+@keyframes panel-sheet-rise {
+    from {
+        transform: translateY(6%);
+        opacity: 0;
+    }
+}
+
+@keyframes panel-sheet-fade {
+    from {
+        opacity: 0;
+    }
+}
+
+/* the little handle that says "this is a sheet you can dismiss" */
+.panel-sheet__grip {
+    width: 42px;
+    height: 4px;
+    margin: 0 auto 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.35);
+    flex: none;
+}
+
+.panel-sheet__head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+    flex: none;
+}
+
+.panel-sheet__number {
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 15px;
+    opacity: 0.7;
+}
+
+.panel-sheet__title {
+    margin: 0;
+    flex: 1;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 22px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+}
+
+.panel-sheet__close {
+    align-self: center;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 50%;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.panel-sheet__close svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+
+/* the only scrolling area — the page behind is locked */
+.panel-sheet__body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.panel-sheet__img {
+    width: 100%;
+    aspect-ratio: 349.97 / 238.69;
+    object-fit: cover;
+    border-radius: 12px;
+    flex: none;
+}
+
+.panel-sheet__para {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--white);
+}
+
+:root[data-theme='light'] .panel-sheet__title,
+:root[data-theme='light'] .panel-sheet__number,
+:root[data-theme='light'] .panel-sheet__para {
+    color: var(--panel-text-light, var(--white));
+}
+
+.panel-sheet__cta {
+    align-self: flex-start;
+    margin-top: 4px;
+}
+
+/* desktop shows the whole copy on the card, so the sheet never applies */
+@media (min-width: 901px) {
+    .panel-sheet {
+        display: none;
+    }
+}
+
+/* ============================================================
    MOBILE  (<=900px)  — Figma 153:3201, REF 390, single column
    ============================================================ */
 @media (max-width: 900px) {
-    /* the copy starts clamped to a few lines and fades out at the cut */
+    /* the copy is clamped to a few lines and fades out at the cut; the rest
+       lives in the sheet that "Read more" opens */
     .panel__copy {
         position: relative;
         max-height: 8.4em;
         overflow: hidden;
-        transition: max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .panel__copy::after {
@@ -242,14 +403,6 @@
         background: linear-gradient(transparent, var(--panel-surface));
         pointer-events: none;
         transition: opacity 0.3s ease;
-    }
-
-    .panel__copy--open {
-        max-height: 200em;
-    }
-
-    .panel__copy--open::after {
-        opacity: 0;
     }
 
     .panel__more {
@@ -282,13 +435,6 @@
     top: 0;
     perspective: 1100px;
     overflow: visible;
-  }
-
-  /* ...but an expanded card is taller than the screen, and a pinned element
-     can't reveal what sits below the fold — so opening one un-pins it */
-  .panel--open {
-    position: relative;
-    top: auto;
   }
 
   .panel__card {

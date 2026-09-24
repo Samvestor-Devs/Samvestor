@@ -1,6 +1,7 @@
 'use client';
 
-import { Fragment, useId, useLayoutEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import './ServicePanel.css';
 
 /**
@@ -9,51 +10,83 @@ import './ServicePanel.css';
  * viewport and the next panel slides up and stacks over it on scroll.
  */
 function ServicePanel({ number, title, paragraphs, image, bg, light = {}, accent }) {
-  // phones only: the full copy is a long read on a narrow screen, so it starts
-  // clamped to a few lines behind a "Read more". The CSS reveals the toggle
-  // under 900px and leaves the copy fully open above it.
+  // Phones only. The full copy is far too long for a card that has to fit the
+  // screen, so the card always shows a short extract and "Read more" opens the
+  // rest in a sheet over the page. Growing the card in place fought the
+  // stack — it had to be un-pinned, which moved the card under the reader's
+  // thumb, and every scroll position below it shifted. The sheet leaves the
+  // page completely untouched.
   const [open, setOpen] = useState(false);
-  const copyId = useId();
-  const articleRef = useRef(null);
-  const anchorRef = useRef(null);
 
-  // remember where the card sits on screen before the toggle, so the jump
-  // below can be undone
-  const toggle = () => {
-    anchorRef.current = articleRef.current?.getBoundingClientRect().top ?? null;
-    setOpen((v) => !v);
-  };
-
-  useLayoutEffect(() => {
-    const el = articleRef.current;
-    if (!el || anchorRef.current === null) return;
-
-    // opening un-pins the card (see the CSS), so a card that was stuck to the
-    // top of the screen snaps down to its place in the flow — on a phone that
-    // threw the heading right off screen. Scroll by the same amount to keep
-    // the card exactly where the reader left it.
-    const drift = el.getBoundingClientRect().top - anchorRef.current;
-    if (drift) window.scrollBy(0, drift);
-    anchorRef.current = null;
-
-    // the page just grew or shrank by a few hundred pixels, so every scroll
-    // position measured below this card is now wrong
-    window.dispatchEvent(new CustomEvent('sv:panel-toggle'));
+  // while the sheet is up: lock the page behind it and let Escape close it
+  useEffect(() => {
+    if (!open) return undefined;
+    const { style } = document.body;
+    const prev = style.overflow;
+    style.overflow = 'hidden';
+    const onKey = (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
   }, [open]);
 
+  const plainTitle = title.replace(/[\n|]/g, ' ').replace(/\s+/g, ' ').trim();
+  const panelColors = {
+    '--panel-bg': bg,
+    '--panel-bg-light': light.bg,
+    '--panel-ink-light': light.ink,
+    '--panel-text-light': light.text,
+  };
+
+  const sheet = (
+    <div className="panel-sheet" role="dialog" aria-modal="true" aria-label={plainTitle}>
+      <button
+        type="button"
+        className="panel-sheet__scrim"
+        aria-label="Close"
+        onClick={() => setOpen(false)}
+      />
+      <div className="panel-sheet__card" style={panelColors}>
+        <div className="panel-sheet__grip" aria-hidden="true" />
+        <header className="panel-sheet__head">
+          <span className="panel-sheet__number">{number}</span>
+          <h2 className="panel-sheet__title">{plainTitle}</h2>
+          <button
+            type="button"
+            className="panel-sheet__close"
+            onClick={() => setOpen(false)}
+            aria-label={`Close ${plainTitle}`}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        </header>
+
+        <div className="panel-sheet__body">
+          <img className="panel-sheet__img" src={image} alt="" />
+          {paragraphs.map((p, i) => (
+            <p key={i} className="panel-sheet__para">
+              {p}
+            </p>
+          ))}
+          <a className={`panel__cta panel__cta--${accent} panel-sheet__cta`} href="#">
+            Book A Call
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <article className={`panel${open ? ' panel--open' : ''}`} ref={articleRef}>
+    <article className="panel">
       {/* the inner card is what gets the 3D transform — keeping it off the
           sticky element avoids the pin/unpin jump */}
-      <div
-        className="panel__card"
-        style={{
-          '--panel-bg': bg,
-          '--panel-bg-light': light.bg,
-          '--panel-ink-light': light.ink,
-          '--panel-text-light': light.text,
-        }}
-      >
+      <div className="panel__card" style={panelColors}>
         <div className="panel__inner">
         {/* heading row: big title + number */}
         <header className="panel__head">
@@ -79,24 +112,15 @@ function ServicePanel({ number, title, paragraphs, image, bg, light = {}, accent
         {/* content row: text column + image */}
         <div className="panel__body">
           <div className="panel__text">
-            <div
-              className={`panel__copy${open ? ' panel__copy--open' : ''}`}
-              id={copyId}
-            >
+            <div className="panel__copy">
               {paragraphs.map((p, i) => (
                 <p key={i} className="panel__para">
                   {p}
                 </p>
               ))}
             </div>
-            <button
-              type="button"
-              className="panel__more"
-              aria-expanded={open}
-              aria-controls={copyId}
-              onClick={toggle}
-            >
-              {open ? 'Read less' : 'Read more'}
+            <button type="button" className="panel__more" onClick={() => setOpen(true)}>
+              Read more
             </button>
             <a
               className={`panel__cta panel__cta--${accent}`}
@@ -110,7 +134,7 @@ function ServicePanel({ number, title, paragraphs, image, bg, light = {}, accent
             <img
               className="panel__img"
               src={image}
-              alt={title.replace(/[\n|]/g, ' ')}
+              alt={plainTitle}
             />
           </div>
         </div>
@@ -118,6 +142,13 @@ function ServicePanel({ number, title, paragraphs, image, bg, light = {}, accent
         {/* darkens as the card recedes — adds depth */}
         <div className="panel__overlay" />
       </div>
+
+      {/* the sheet goes on <body>: the card itself carries a 3D transform
+          while it recedes, and a fixed child of a transformed element is
+          trapped inside it instead of covering the screen */}
+      {/* `open` only ever becomes true from a click, so there is a document
+          here — no need to track mounting for the server render */}
+      {open && createPortal(sheet, document.body)}
     </article>
   );
 }
