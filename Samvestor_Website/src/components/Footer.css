@@ -2,18 +2,31 @@
    All sizes are Figma px made fluid via --fx. */
 .footer {
     background: var(--canvas);
-    overflow: hidden;
+    /* clip, not hidden: `overflow: hidden` would make this a scroll container
+       and the sticky wordmark below would stop sticking */
+    overflow: clip;
     text-align: left;
+    position: relative;
 }
 
 /* ---- Top area ---- */
 .footer__top {
+    /* the sheet that slides up off the wordmark: it sits above it and is
+       opaque, so the name behind only shows as this clears the bottom */
+    position: relative;
+    z-index: 1;
+    background: var(--canvas);
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: calc(60 * var(--fx));
-    padding: calc(24 * var(--fx)) calc(60 * var(--fx)) calc(124 * var(--fx));
+    /* the old 124 bottom left a dead band between the columns and the
+       wordmark once the name started showing through */
+    padding: calc(24 * var(--fx)) calc(60 * var(--fx)) calc(56 * var(--fx));
     box-sizing: border-box;
+    /* a soft drop below the sheet's edge, so it reads as a layer lifting off
+       the wordmark rather than a hard cut */
+    box-shadow: 0 calc(16 * var(--fx)) calc(34 * var(--fx)) rgba(0, 0, 0, 0.55);
 }
 
 /* ---- Brand / tagline ---- */
@@ -147,7 +160,14 @@ a.footer__link:hover {
 }
 
 /* ---- Giant embossed wordmark (pure CSS/SVG, no image) ---- */
+/* The wordmark lies on a layer behind the footer, pinned to the bottom of
+   the screen. The footer sheet above scrolls up off it, so the name is
+   uncovered from the top down and is fully out only at the very end of the
+   page — no JS, it's just the stacking order plus a sticky bottom. */
 .footer__wordmark {
+    position: sticky;
+    bottom: 0;
+    z-index: 0;
     line-height: 0;
     /* letters sink into the page bottom like the Figma mask */
     -webkit-mask-image: linear-gradient(180deg, #000 55%, rgba(0, 0, 0, 0.35) 100%);
@@ -173,7 +193,8 @@ a.footer__link:hover {
     .footer__top {
         flex-direction: column;
         gap: calc(37 * var(--fx));
-        padding: calc(16 * var(--fx)) calc(20 * var(--fx)) calc(40 * var(--fx));
+        padding: calc(16 * var(--fx)) calc(20 * var(--fx)) calc(22 * var(--fx));
+        box-shadow: 0 calc(10 * var(--fx)) calc(22 * var(--fx)) rgba(0, 0, 0, 0.55);
     }
 
     .footer__tagline {
