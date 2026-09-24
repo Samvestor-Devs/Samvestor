@@ -280,18 +280,14 @@
        pinned to the same top edge and covered it. */
     position: relative;
     top: auto;
-    /* depth for the card's tilt-back as it scrolls away (ServicesSection) */
-    perspective: 1000px;
+    perspective: none;
     overflow: visible;
   }
   .panel__card {
     position: relative;
     inset: auto;
     padding-top: 0;
-    /* the tilt-back is driven by GSAP here (it used to be blocked by a
-       transform: none !important, which silently ate the animation) */
-    transform-origin: center top;
-    will-change: transform;
+    transform: none !important; /* no 3D recede on mobile */
   }
 
   .panel__inner {

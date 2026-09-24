@@ -161,18 +161,10 @@ function ServicesSection() {
       ScrollTrigger.refresh();
       }); // mm.add
 
-      // phones: the cards aren't pinned (that buried the copy), so they get
-      // the same feel on the way past instead — each card lifts in as it
-      // arrives, then falls back in 3D and dims as it leaves the top
+      // phones: the cards scroll past normally, so each one lifts in as it
+      // arrives instead of pinning and stacking
       mm.add('(max-width: 900px)', () => {
-        gsap.utils.toArray('.panel', sectionRef.current).forEach((panel, i) => {
-          const card = panel.querySelector('.panel__card');
-          const overlay = panel.querySelector('.panel__overlay');
-          if (!card) return;
-
-          // alternate the lean so the stack doesn't tip all one way
-          const dir = i % 2 === 0 ? 1 : -1;
-
+        gsap.utils.toArray('.panel__card', sectionRef.current).forEach((card) => {
           gsap.from(card, {
             y: 40,
             autoAlpha: 0,
@@ -180,28 +172,6 @@ function ServicesSection() {
             ease: 'expo.out',
             scrollTrigger: { trigger: card, start: 'top 88%', once: true },
           });
-
-          const recede = gsap.timeline({
-            defaults: { ease: 'none' },
-            scrollTrigger: {
-              trigger: card,
-              // begins once the card's own bottom passes the middle of the
-              // screen, so it only tilts on the way out — never while you're
-              // still reading it
-              start: 'bottom 60%',
-              end: 'bottom top',
-              scrub: 0.6,
-            },
-          });
-
-          recede.fromTo(
-            card,
-            { rotate: 0, rotateX: 0, scale: 1 },
-            { rotate: 1.6 * dir, rotateX: 16, scale: 0.92, force3D: true },
-            0
-          );
-
-          if (overlay) recede.fromTo(overlay, { opacity: 0 }, { opacity: 0.5 }, 0);
         });
       });
     }, sectionRef);

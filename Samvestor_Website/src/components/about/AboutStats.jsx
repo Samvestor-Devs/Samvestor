@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { prefersReducedMotion, revealLines } from './reveal';
+import { prefersReducedMotion } from './reveal';
 import './AboutStats.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -53,29 +53,6 @@ function AboutStats() {
 
             if (reduce) return;
 
-            // the heading card deals itself in like one of the stat cards,
-            // and its title rises line by line behind a mask
-            const head = q('.astats__head-card')[0];
-            if (head) {
-                gsap.from(head, {
-                    y: 46,
-                    rotate: -2.2,
-                    scale: 0.92,
-                    autoAlpha: 0,
-                    duration: 1.1,
-                    ease: 'expo.out',
-                    scrollTrigger: { trigger: head, start: 'top 88%', once: true },
-                });
-                revealLines(q('.astats__title')[0], { start: 'top 85%', stagger: 0.1, duration: 1 });
-                gsap.from(q('.astats__rule')[0], {
-                    scaleX: 0,
-                    duration: 0.9,
-                    delay: 0.25,
-                    ease: 'expo.out',
-                    scrollTrigger: { trigger: head, start: 'top 88%', once: true },
-                });
-            }
-
             // desktop: parallax drift + a soft settle as each card arrives
             const mm = gsap.matchMedia();
             mm.add('(min-width: 901px)', () => {
@@ -108,18 +85,13 @@ function AboutStats() {
     return (
         <section className="astats" ref={sectionRef} aria-labelledby="astats-title">
             <div className="astats__head">
-                {/* the heading sits on the same white card as the figures
-                    below it, so the section reads as one deck */}
-                <div className="astats__head-card">
-                    <h2 className="astats__title" id="astats-title">
-                        Built on Measurable Growth &amp; Execution
-                    </h2>
-                    <span className="astats__rule" aria-hidden="true" />
-                    <p className="astats__sub">
-                        Seven years of scaling D2C brands across India - every number on this page is real, tracked and
-                        earned
-                    </p>
-                </div>
+                <h2 className="astats__title" id="astats-title">
+                    Built on Measurable Growth &amp; Execution
+                </h2>
+                <p className="astats__sub">
+                    Seven years of scaling D2C brands across India - every number on this page is real, tracked and
+                    earned
+                </p>
             </div>
 
             <ul className="astats__field">

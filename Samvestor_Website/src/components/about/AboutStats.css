@@ -25,49 +25,22 @@
     text-align: center;
 }
 
-/* the heading wears the same white card as the figures below it */
-.astats__head-card {
-    box-sizing: border-box;
-    width: min(calc(720 * var(--fx)), 100%);
-    padding: calc(38 * var(--fx)) calc(44 * var(--fx)) calc(34 * var(--fx));
-    border-radius: calc(14 * var(--fx));
-    background: #ffffff;
-    color: var(--navy-900);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: calc(16 * var(--fx));
-    box-shadow: 0 calc(30 * var(--fx)) calc(60 * var(--fx)) rgba(0, 0, 0, 0.28);
-}
-
 .astats__title {
     margin: 0;
     font-family: var(--font-body);
-    font-weight: 800;
+    font-weight: 700;
     font-size: max(calc(40 * var(--fx)), 26px);
     line-height: 1.15;
     letter-spacing: -0.01em;
-    color: inherit;
-    text-wrap: balance;
-}
-
-/* gold hairline between the title and the line under it */
-.astats__rule {
-    display: block;
-    width: calc(64 * var(--fx));
-    min-width: 48px;
-    height: 2px;
-    background: var(--gold);
-    transform-origin: 50% 50%;
+    color: #ffffff;
 }
 
 .astats__sub {
     margin: 0;
     font-family: var(--font-body);
-    font-weight: 700;
-    font-size: max(calc(15 * var(--fx)), 14px);
+    font-size: max(calc(13 * var(--fx)), 12px);
     line-height: 1.5;
-    color: rgba(11, 26, 46, 0.72);
+    color: rgba(237, 242, 248, 0.75);
 }
 
 /* ---- the card field (desktop: scattered, positions from the design) ---- */
@@ -148,19 +121,14 @@
         gap: calc(12 * var(--fx));
     }
 
-    .astats__head-card {
-        width: 100%;
-        padding: calc(26 * var(--fx)) calc(22 * var(--fx)) calc(24 * var(--fx));
-        gap: calc(12 * var(--fx));
-    }
-
     .astats__title {
-        font-size: max(calc(26 * var(--fx)), 24px);
-        line-height: 1.2;
+        font-weight: 400;
+        font-family: var(--font-display);
+        font-size: calc(22 * var(--fx));
     }
 
     .astats__sub {
-        font-size: max(calc(14 * var(--fx)), 14px);
+        font-size: max(calc(13 * var(--fx)), 13px);
     }
 
     .astats__field {
