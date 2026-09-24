@@ -104,6 +104,13 @@ function Navbar() {
         };
     }, []);
 
+    // publish whether the bar is on screen, so content pinned to the top of
+    // the viewport (the process image on phones) can drop below it instead of
+    // being covered when the bar slides back in
+    useEffect(() => {
+        document.documentElement.dataset.nav = hidden && !mobileOpen ? 'hidden' : 'shown';
+    }, [hidden, mobileOpen]);
+
     const closeMobileMenu = () => setMobileOpen(false);
     const toggleMobileMenu = () => setMobileOpen((prev) => !prev);
 

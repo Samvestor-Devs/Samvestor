@@ -247,13 +247,23 @@
     max-width: 100%;
     order: -1; /* show the image above the steps on mobile */
     position: sticky;
+    /* the header hides on scroll down and slides back on scroll up; when it
+       is on screen the image drops below it rather than being covered
+       (data-nav comes from Navbar.jsx) */
     top: 0;
+    transition: top 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 2;
     /* an opaque strip top and bottom: the padding belongs to the pinned box,
        so steps passing behind never peek out around the image */
     padding: calc(10 * var(--fx)) 0 calc(14 * var(--fx));
     background: var(--process-surface);
   }
+  /* the phone header is fixed px (58 tall, 10–12 from the top), so this
+     offset is too: it clears the bar with a small gap at every width */
+  :root[data-nav='shown'] .process__media {
+    top: 78px;
+  }
+
   .process__sticky {
     position: relative;
     top: 0;
