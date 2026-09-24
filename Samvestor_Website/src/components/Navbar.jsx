@@ -8,18 +8,25 @@ import './Navbar.css';
 
 const logoWhite = '/sv-logo-white.png';
 
-/* `href` starting with "/" is a route; "#..." is a section on the home page. */
+/* `href` starting with "/" is a route; "#..." is a section on the home page.
+   `ready` is whether that destination exists yet — only ready items are shown,
+   so nothing in the bar can be clicked into nowhere. As each page or section
+   is built, flip its flag to true and the link appears. */
 const navItems = [
-    { id: 'home', href: '#home', label: 'Home' },
-    { id: 'about-us', href: '/about', label: 'About us' },
-    { id: 'services', href: '#services', label: 'Services' },
-    { id: 'careers', href: '#careers', label: 'Careers' },
-    { id: 'case-studies', href: '#case-studies', label: 'Case Studies' },
-    { id: 'contact-us', href: '#contact-us', label: 'Contact Us' },
+    { id: 'home', href: '#home', label: 'Home', ready: true }, // HeroSection
+    { id: 'about-us', href: '/about', label: 'About us', ready: true }, // app/about
+    { id: 'services', href: '#services', label: 'Services', ready: false },
+    { id: 'careers', href: '#careers', label: 'Careers', ready: false },
+    { id: 'case-studies', href: '#case-studies', label: 'Case Studies', ready: false },
+    { id: 'contact-us', href: '#contact-us', label: 'Contact Us', ready: false },
 ];
 
+const liveNavItems = navItems.filter((item) => item.ready);
+
 const ctaLink = {
-    href: '#book-a-call',
+    // #book-a-call was never built, so the button went nowhere — this is the
+    // same booking link the Process section and the service cards use
+    href: 'https://calendly.com/samvestor/30-minutes-consultation-call',
     label: 'Book A Call',
 };
 
@@ -160,7 +167,7 @@ function Navbar() {
                     </Link>
 
                     <ul className="navbar-nav" id="navbarNav">
-                        {navItems.map((item) => (
+                        {liveNavItems.map((item) => (
                             <li className="nav-item" key={item.id}>
                                 <Link
                                     href={toHref(item.href, pathname)}
@@ -175,16 +182,18 @@ function Navbar() {
 
                     <ThemeToggle className="navbar-theme-toggle" />
 
-                    <Link
-                        href={toHref(ctaLink.href, pathname)}
+                    <a
+                        href={ctaLink.href}
                         className="cta-button"
-                        onClick={(event) => handleNavigationClick(event, ctaLink.href, true)}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={closeMobileMenu}
                     >
                         <span className="cta-icon">
                             <PhoneIcon />
                         </span>
                         <span className="cta-label">{ctaLink.label}</span>
-                    </Link>
+                    </a>
 
                     <ThemeToggle className="navbar-theme-toggle-mobile" />
 
@@ -219,7 +228,7 @@ function Navbar() {
             >
                 <nav className="mobile-menu-inner" aria-label="Menu">
                     <ul className="mobile-menu-nav">
-                        {navItems.map((item, i) => (
+                        {liveNavItems.map((item, i) => (
                             <li className="mobile-menu-item" key={item.id} style={{ '--i': i }}>
                                 <Link
                                     href={toHref(item.href, pathname)}
@@ -234,17 +243,19 @@ function Navbar() {
                         ))}
                     </ul>
 
-                    <div className="mobile-menu-footer" style={{ '--i': navItems.length }}>
-                        <Link
-                            href={toHref(ctaLink.href, pathname)}
+                    <div className="mobile-menu-footer" style={{ '--i': liveNavItems.length }}>
+                        <a
+                            href={ctaLink.href}
                             className="cta-button mobile-cta-button"
-                            onClick={(event) => handleNavigationClick(event, ctaLink.href, true)}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={closeMobileMenu}
                         >
                             <span className="cta-icon">
                                 <PhoneIcon />
                             </span>
                             <span className="cta-label">{ctaLink.label}</span>
-                        </Link>
+                        </a>
                         <div className="mobile-menu-contact">
                             <a href="mailto:samvestor@gmail.com">samvestor@gmail.com</a>
                             <a href="tel:+917996600003">079966 00003</a>
