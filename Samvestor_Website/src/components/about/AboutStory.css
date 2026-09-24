@@ -74,6 +74,12 @@
     color: var(--gold);
 }
 
+/* brand gold on white only reaches 2.3:1 at this size — the light theme
+   gets a deeper gold so the quote is actually readable */
+:root[data-theme='light'] .astory__quote {
+    color: #8a6a1e;
+}
+
 .astory__sign {
     margin-top: calc(16 * var(--fx)) !important;
     font-weight: 600;

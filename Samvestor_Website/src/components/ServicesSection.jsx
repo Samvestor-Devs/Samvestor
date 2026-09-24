@@ -57,7 +57,9 @@ const SERVICES = [
     ],
     image: PLACEHOLDER,
     bg: '#243d66',
-    light: { bg: '#7a9cc4', ink: '#313e4e', text: '#edf2f8' },
+    // dark body copy: this panel's light blue is too pale to carry the
+    // near-white text the dark theme uses (it measured 2.5:1)
+    light: { bg: '#7a9cc4', ink: '#313e4e', text: '#0a0a0a' },
     accent: 'gold',
   },
   {

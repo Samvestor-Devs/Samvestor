@@ -153,7 +153,11 @@ h1,
 h2 {
   font-family: var(--heading);
   font-weight: 500;
-  color: var(--text-h);
+  /* inherit the section's colour, never --text-h: that one follows the OS
+     colour scheme, so on a light-themed page viewed by someone whose system
+     is in dark mode every heading without its own colour turned near-white
+     on white (the About "Team" and story headings were invisible) */
+  color: inherit;
 }
 
 h1 {

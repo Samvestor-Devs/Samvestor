@@ -552,3 +552,21 @@
 :root[data-theme='light'] .panel__para {
   color: var(--panel-text-light, var(--white));
 }
+
+/* light theme: the first panels turn pale, where a cream/white button label
+   all but disappeared. The label follows the panel's own body-text colour,
+   which is already chosen to read on that panel — so the pale cards get a
+   dark label and the deeper blue ones keep a light one. */
+:root[data-theme='light'] .panel__cta--gold,
+:root[data-theme='light'] .panel__cta--white,
+:root[data-theme='light'] .panel__more {
+  color: var(--panel-text-light, var(--off-white));
+}
+
+/* the hover fill is gold, so the label goes dark to stay readable on it */
+:root[data-theme='light'] .panel__cta:hover,
+:root[data-theme='light'] .panel__cta:focus-visible {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--navy-900);
+}
