@@ -333,10 +333,10 @@
     }
 
     .arel__card-sub {
-        font-size: calc(12 * var(--fx));
+        font-size: max(calc(12 * var(--fx)), 12px);
     }
 
     .arel__card-body {
-        font-size: calc(14 * var(--fx));
+        font-size: max(calc(15 * var(--fx)), 15px);
     }
 }

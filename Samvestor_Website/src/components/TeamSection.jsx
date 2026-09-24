@@ -54,30 +54,39 @@ function TeamSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      lineRefs.current.forEach((path) => {
-      if (!path) return;
-      const length = path.getTotalLength();
+      const mm = gsap.matchMedia();
 
-      // start fully hidden (line "un-drawn")
-      gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
+      // only the line that's actually on screen gets measured and drawn:
+      // the other SVG is display:none, where getTotalLength is meaningless
+      // and the scrub work is wasted (it cost phones a second live trigger)
+      const draw = (index) => () => {
+        const path = lineRefs.current[index];
+        if (!path) return;
+        const length = path.getTotalLength();
 
-      // draw it as the section scrolls: start -> end
-      gsap.to(path, {
-        strokeDashoffset: 0,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          // begins once the section is well on screen, so the growing tip
-          // stays visible even as it dips around the bottom of the loop
-          start: 'top 40%',
-          // finishes as the section's bottom comes into view, so the line's
-          // end is drawn while it's on screen (was 'bottom 20%' — too slow,
-          // it finished after scrolling out of view)
-          end: 'bottom 90%',
-          scrub: true,
-        },
-      });
-      });
+        // start fully hidden (line "un-drawn")
+        gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
+
+        // draw it as the section scrolls: start -> end
+        gsap.to(path, {
+          strokeDashoffset: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            // begins once the section is well on screen, so the growing tip
+            // stays visible even as it dips around the bottom of the loop
+            start: 'top 40%',
+            // finishes as the section's bottom comes into view, so the line's
+            // end is drawn while it's on screen (was 'bottom 20%' — too slow,
+            // it finished after scrolling out of view)
+            end: 'bottom 90%',
+            scrub: true,
+          },
+        });
+      };
+
+      mm.add('(min-width: 901px)', draw(0));
+      mm.add('(max-width: 900px)', draw(1));
     }, sectionRef);
 
     return () => ctx.revert(); // clean up triggers on unmount

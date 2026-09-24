@@ -184,4 +184,38 @@
     font-size: calc(58 * var(--fx));
     bottom: calc(24 * var(--fx));
   }
+
+  /* phones: a shorter track (the three states still get a full screen of
+     scroll each, but the hero no longer eats four) */
+  .ahero {
+    height: 300vh;
+  }
+
+  /* the line pairs stack down the middle instead of hugging the left and
+     right edges, where they crowded the globe and ran ragged */
+  .ahero--globe .ahero__text {
+    left: calc(20 * var(--fx));
+    right: calc(20 * var(--fx));
+    max-width: none;
+    text-align: center;
+    font-size: max(calc(19 * var(--fx)), 17px);
+    line-height: 1.35;
+    text-wrap: balance;
+  }
+
+  .ahero--globe .ahero__s2-left {
+    top: 40%;
+  }
+
+  .ahero--globe .ahero__s2-right {
+    top: 52%;
+  }
+
+  .ahero--globe .ahero__s3-left {
+    top: 34%;
+  }
+
+  .ahero--globe .ahero__s3-right {
+    top: 52%;
+  }
 }

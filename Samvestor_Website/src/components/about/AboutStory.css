@@ -91,9 +91,21 @@
         position: static;
     }
 
+    /* 13 design px landed at ~12.5px on a phone — too small to read
+       comfortably, so the body copy keeps a 15px floor here */
     .astory__text {
-        font-size: calc(13 * var(--fx));
-        line-height: 1.7;
-        gap: calc(10 * var(--fx));
+        font-size: max(calc(15 * var(--fx)), 15px);
+        line-height: 1.75;
+        gap: calc(14 * var(--fx));
+        text-align: left;
+    }
+
+    .astory__quote {
+        text-align: center;
+    }
+
+    /* the portrait doesn't need to fill the screen above the story */
+    .astory__media {
+        width: 72%;
     }
 }

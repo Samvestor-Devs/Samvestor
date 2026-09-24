@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment } from 'react';
+import { Fragment, useId, useState } from 'react';
 import './ServicePanel.css';
 
 /**
@@ -9,6 +9,12 @@ import './ServicePanel.css';
  * viewport and the next panel slides up and stacks over it on scroll.
  */
 function ServicePanel({ number, title, paragraphs, image, bg, light = {}, accent }) {
+  // phones only: the full copy is a long read on a narrow screen, so it starts
+  // clamped to a few lines behind a "Read more". The CSS reveals the toggle
+  // under 900px and leaves the copy fully open above it.
+  const [open, setOpen] = useState(false);
+  const copyId = useId();
+
   return (
     <article className="panel">
       {/* the inner card is what gets the 3D transform — keeping it off the
@@ -47,13 +53,25 @@ function ServicePanel({ number, title, paragraphs, image, bg, light = {}, accent
         {/* content row: text column + image */}
         <div className="panel__body">
           <div className="panel__text">
-            <div className="panel__copy">
+            <div
+              className={`panel__copy${open ? ' panel__copy--open' : ''}`}
+              id={copyId}
+            >
               {paragraphs.map((p, i) => (
                 <p key={i} className="panel__para">
                   {p}
                 </p>
               ))}
             </div>
+            <button
+              type="button"
+              className="panel__more"
+              aria-expanded={open}
+              aria-controls={copyId}
+              onClick={() => setOpen((v) => !v)}
+            >
+              {open ? 'Read less' : 'Read more'}
+            </button>
             <a
               className={`panel__cta panel__cta--${accent}`}
               href="#"

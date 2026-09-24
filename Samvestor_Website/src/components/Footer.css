@@ -208,9 +208,13 @@ a.footer__link:hover {
         line-height: 1.625;
     }
 
+    /* footer links double as tap targets, so they get a readable floor and
+       a little vertical room rather than the 13px they had */
     .footer__link {
-        font-size: max(calc(14 * var(--fx)), 13px);
-        line-height: 1.571;
+        font-size: max(calc(15 * var(--fx)), 15px);
+        line-height: 1.6;
+        display: inline-block;
+        padding: calc(3 * var(--fx)) 0;
     }
 
     .footer__contact-row {

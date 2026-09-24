@@ -45,7 +45,10 @@
   will-change: transform;
   transform: translateZ(0);
   backface-visibility: hidden;
-  background: var(--panel-bg);
+  /* the card's own surface colour, so anything that has to blend into it
+     (the mobile "read more" fade) can follow the theme */
+  --panel-surface: var(--panel-bg);
+  background: var(--panel-surface);
 }
 
 /* depth dimmer — GSAP fades this in as the card sinks back */
@@ -212,19 +215,71 @@
   transform: scale(1.06);
 }
 
+/* the "Read more" toggle is a phone affordance only (see the mobile block) */
+.panel__more {
+    display: none;
+}
+
 /* ============================================================
    MOBILE  (<=900px)  — Figma 153:3201, REF 390, single column
    ============================================================ */
 @media (max-width: 900px) {
+    /* the copy starts clamped to a few lines and fades out at the cut */
+    .panel__copy {
+        position: relative;
+        max-height: 8.4em;
+        overflow: hidden;
+        transition: max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .panel__copy::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3em;
+        background: linear-gradient(transparent, var(--panel-surface));
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .panel__copy--open {
+        max-height: 200em;
+    }
+
+    .panel__copy--open::after {
+        opacity: 0;
+    }
+
+    .panel__more {
+        display: inline-block;
+        align-self: flex-start;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: inherit;
+        font-family: var(--font-body);
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        cursor: pointer;
+        /* comfortable tap target without pushing the layout around */
+        min-height: 44px;
+    }
+
   .panel {
     height: auto; /* mobile cards grow with their content */
     min-height: auto;
     /* inline-size, not size: size containment would collapse an auto height */
     container-type: inline-size;
-    /* keep the stack-over scroll on mobile too (no 3D recede — the next
-       card simply slides up and covers the pinned one) */
-    position: sticky;
-    top: 0;
+    /* phones scroll the cards normally. The stack-over pin hid whatever sat
+       below the fold — including the expanded copy — because the next card
+       pinned to the same top edge and covered it. */
+    position: relative;
+    top: auto;
     perspective: none;
     overflow: visible;
   }
@@ -269,7 +324,9 @@
   }
 
   .panel__body {
-    flex-direction: column;
+    /* image first, then the words: on a phone the picture is the hook, and
+       it used to sit below two full paragraphs where nobody reached it */
+    flex-direction: column-reverse;
     align-items: stretch;
     gap: max(calc(20 / 390 * 100cqw), 16px);
     padding-top: max(calc(20 / 390 * 100cqw), 16px);
@@ -282,9 +339,14 @@
     gap: max(calc(14 / 390 * 100cqw), 11px);
   }
   .panel__para {
-    font-size: max(calc(14 / 390 * 100cqw), 14px);
-    line-height: 1.571;
+    font-size: max(calc(15 / 390 * 100cqw), 15px);
+    line-height: 1.6;
     text-align: left;
+  }
+
+  /* space between paragraphs — they ran together once both were visible */
+  .panel__para + .panel__para {
+    margin-top: 0.85em;
   }
 
   .panel__cta {
@@ -315,7 +377,8 @@
 }
 
 :root[data-theme='light'] .panel__card {
-  background: var(--panel-bg-light, var(--panel-bg));
+  --panel-surface: var(--panel-bg-light, var(--panel-bg));
+  background: var(--panel-surface);
 }
 
 :root[data-theme='light'] .panel__title,

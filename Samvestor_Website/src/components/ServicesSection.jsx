@@ -160,6 +160,20 @@ function ServicesSection() {
 
       ScrollTrigger.refresh();
       }); // mm.add
+
+      // phones: the cards scroll past normally, so each one lifts in as it
+      // arrives instead of pinning and stacking
+      mm.add('(max-width: 900px)', () => {
+        gsap.utils.toArray('.panel__card', sectionRef.current).forEach((card) => {
+          gsap.from(card, {
+            y: 40,
+            autoAlpha: 0,
+            duration: 0.8,
+            ease: 'expo.out',
+            scrollTrigger: { trigger: card, start: 'top 88%', once: true },
+          });
+        });
+      });
     }, sectionRef);
 
     return () => ctx.revert();

@@ -254,6 +254,14 @@
   .process__item {
     opacity: 1;
   }
+
+  /* 14 design px lands near 13px on a phone; body copy keeps a 15px floor */
+  .process__eyebrow,
+  .process__intro,
+  .process__item-body {
+    font-size: max(calc(15 * var(--fx)), 15px);
+    line-height: 1.6;
+  }
 }
 
 /* light theme: this band stays navy (Figma raised surface) */

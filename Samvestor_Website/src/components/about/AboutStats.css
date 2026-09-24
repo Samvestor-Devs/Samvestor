@@ -128,7 +128,7 @@
     }
 
     .astats__sub {
-        font-size: calc(10 * var(--fx));
+        font-size: max(calc(13 * var(--fx)), 13px);
     }
 
     .astats__field {
@@ -146,10 +146,12 @@
         display: none;
     }
 
+    /* slightly narrower than the screen so the next card peeks in and the
+       row reads as swipeable */
     .astats__card {
         position: static;
-        flex: 0 0 calc(310 * var(--fx));
-        height: calc(360 * var(--fx));
+        flex: 0 0 calc(286 * var(--fx));
+        height: calc(330 * var(--fx));
         scroll-snap-align: center;
     }
 

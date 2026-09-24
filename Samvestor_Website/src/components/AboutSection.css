@@ -47,8 +47,10 @@
 
 /* mobile (--fx base is 390) */
 @media (max-width: 900px) {
+  /* shorter track: the phone reveal is a quick cascade, so it no longer needs
+     two and a half screens of scrolling to finish */
   .about {
-    height: 260vh;
+    height: 170vh;
   }
   .about__sticky {
     align-items: center;
@@ -57,6 +59,7 @@
   .about__text {
     max-width: 100%;
     font-size: max(calc(26 * var(--fx)), 20px);
+    line-height: 1.35;
   }
 }
 

@@ -24,33 +24,58 @@ function AboutSection() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const words = wordRefs.current.filter(Boolean);
+      const track = {
+        trigger: sectionRef.current,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1, // 1s smoothing so motion eases toward the scroll position
+        invalidateOnRefresh: true, // re-read window width on resize
+      };
 
-      // scroll-driven via a sticky track: each word starts fully off-screen to
-      // the right (hidden) and flies in to its place as you scroll. fromTo +
-      // immediateRender guarantees the hidden start state is committed on load
-      // (so nothing flashes into view before the first scroll). No fade — both
-      // ends are fully opaque, only the position animates.
-      gsap.fromTo(
-        words,
-        { x: () => window.innerWidth, autoAlpha: 1 },
-        {
-          x: 0,
-          autoAlpha: 1,
-          immediateRender: true,
-          duration: 1.4,
-          ease: 'power2.out',
-          // smaller stagger than the duration => several words are mid-flight
-          // at once, each starting a little after the last (a smooth cascade)
-          stagger: 0.18,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top top',
-            end: 'bottom bottom',
-            scrub: 1, // 1s smoothing so motion eases toward the scroll position
-            invalidateOnRefresh: true, // re-read window width on resize
-          },
-        }
-      );
+      const mm = gsap.matchMedia();
+
+      // desktop: each word starts fully off-screen to the right (hidden) and
+      // flies in to its place as you scroll. fromTo + immediateRender
+      // guarantees the hidden start state is committed on load (so nothing
+      // flashes into view before the first scroll). No fade — both ends are
+      // fully opaque, only the position animates.
+      mm.add('(min-width: 901px)', () => {
+        gsap.fromTo(
+          words,
+          { x: () => window.innerWidth, autoAlpha: 1 },
+          {
+            x: 0,
+            autoAlpha: 1,
+            immediateRender: true,
+            duration: 1.4,
+            ease: 'power2.out',
+            // smaller stagger than the duration => several words are mid-flight
+            // at once, each starting a little after the last (a smooth cascade)
+            stagger: 0.18,
+            scrollTrigger: track,
+          }
+        );
+      });
+
+      // phones: flying a word across the whole screen leaves most of a narrow
+      // screen empty, and one-word-at-a-time made the read crawl. Words lift
+      // and fade in in a quick cascade instead, several at a time, over a much
+      // shorter track (see the 170vh in the CSS).
+      mm.add('(max-width: 900px)', () => {
+        gsap.fromTo(
+          words,
+          { y: 18, autoAlpha: 0 },
+          {
+            y: 0,
+            autoAlpha: 1,
+            immediateRender: true,
+            duration: 0.5,
+            ease: 'power2.out',
+            stagger: 0.07,
+            scrollTrigger: track,
+          }
+        );
+      });
     }, sectionRef);
 
     // fonts load after first paint and shift layout — recompute trigger

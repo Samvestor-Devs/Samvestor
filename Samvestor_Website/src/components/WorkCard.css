@@ -170,6 +170,19 @@
   .work-card__tags,
   .work-card__year {
     color: #8f8c8c;
+    font-size: max(calc(14 * var(--fx)), 14px);
+  }
+
+  /* phones show the photo automatically as the card passes the middle of the
+     screen, so the title sits over a bright image far more of the time than
+     it does on hover — darken the scrim so it stays readable */
+  .work-card__image::after {
+    background: rgba(7, 11, 18, 0.62);
+  }
+
+  .work-card.is-active .work-card__tags,
+  .work-card.is-active .work-card__year {
+    color: var(--off-white);
   }
 }
 
