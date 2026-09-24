@@ -264,10 +264,18 @@
     top: 78px;
   }
 
+  /* the image floats clear of the header now, so its corners are on show —
+     a softer radius than the desktop 16 keeps the edges from reading as a
+     hard rectangular cut */
   .process__sticky {
     position: relative;
     top: 0;
     height: calc(300 * var(--fx));
+    border-radius: calc(26 * var(--fx));
+  }
+
+  .process__img {
+    border-radius: inherit;
   }
   .process__list {
     gap: calc(56 * var(--fx));
