@@ -16,7 +16,7 @@ function ServicePanel({ number, title, paragraphs, image, bg, light = {}, accent
   const copyId = useId();
 
   return (
-    <article className="panel">
+    <article className={`panel${open ? ' panel--open' : ''}`}>
       {/* the inner card is what gets the 3D transform — keeping it off the
           sticky element avoids the pin/unpin jump */}
       <div

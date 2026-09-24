@@ -161,17 +161,46 @@ function ServicesSection() {
       ScrollTrigger.refresh();
       }); // mm.add
 
-      // phones: the cards scroll past normally, so each one lifts in as it
-      // arrives instead of pinning and stacking
+      // phones: same idea as desktop, but measured per panel — mobile panels
+      // are as tall as their content, not exactly one screen each, so the
+      // recede runs over the window where the next card slides up and covers
+      // this one (its bottom edge crossing the screen, bottom to top).
       mm.add('(max-width: 900px)', () => {
-        gsap.utils.toArray('.panel__card', sectionRef.current).forEach((card) => {
-          gsap.from(card, {
-            y: 40,
-            autoAlpha: 0,
-            duration: 0.8,
-            ease: 'expo.out',
-            scrollTrigger: { trigger: card, start: 'top 88%', once: true },
+        const panels = gsap.utils.toArray('.panel', sectionRef.current);
+
+        panels.forEach((panel, i) => {
+          const card = panel.querySelector('.panel__card');
+          const overlay = panel.querySelector('.panel__overlay');
+          const next = panels[i + 1];
+          // the last card has nothing sliding over it, so it just scrolls away
+          if (!card || !next) return;
+
+          const tl = gsap.timeline({
+            defaults: { ease: 'none' },
+            scrollTrigger: {
+              // measured on the NEXT card, not this one: a phone card is
+              // shorter than the screen, so this card's own bottom edge
+              // crosses the viewport while you're still reading it — timing
+              // the recede off that made it tilt away far too early
+              trigger: next,
+              start: 'top 70%', // the next card is climbing over this one
+              end: 'top top', // and has now covered it
+              scrub: 0.5,
+              invalidateOnRefresh: true,
+            },
           });
+
+          // no z-rotation here, unlike desktop: on a narrow screen even a
+          // 1.6deg lean swings the card's corners past the edge and the page
+          // picks up a horizontal scrollbar
+          tl.fromTo(
+            card,
+            { rotateX: 0, scale: 1, yPercent: 0 },
+            { rotateX: 15, scale: 0.93, yPercent: -2.5, force3D: true },
+            0
+          );
+
+          if (overlay) tl.fromTo(overlay, { opacity: 0 }, { opacity: 0.5 }, 0);
         });
       });
     }, sectionRef);

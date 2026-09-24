@@ -53,7 +53,32 @@ function AboutStats() {
 
             if (reduce) return;
 
-            // desktop: parallax drift + a soft settle as each card arrives
+            // every card deals itself in: it lands from a tilt, and its gold
+            // rule draws out from the middle (same language as the cards in
+            // "What We Do Relentlessly")
+            q('.astats__card').forEach((card, i) => {
+                const inner = card.querySelector('.astats__card-inner');
+                gsap.from(inner, {
+                    y: 40,
+                    rotate: i % 2 ? 4 : -4,
+                    scale: 0.9,
+                    autoAlpha: 0,
+                    duration: 1,
+                    ease: 'expo.out',
+                    scrollTrigger: { trigger: card, start: 'top 92%', once: true },
+                });
+                gsap.from(card.querySelector('.astats__rule'), {
+                    scaleX: 0,
+                    autoAlpha: 0,
+                    duration: 0.8,
+                    delay: 0.3,
+                    ease: 'expo.out',
+                    scrollTrigger: { trigger: card, start: 'top 92%', once: true },
+                });
+            });
+
+            // desktop: the cards also drift past the pinned heading at
+            // different speeds, for depth
             const mm = gsap.matchMedia();
             mm.add('(min-width: 901px)', () => {
                 q('.astats__card').forEach((card, i) => {
@@ -67,14 +92,6 @@ function AboutStats() {
                             scrollTrigger: { trigger: card, start: 'top bottom', end: 'bottom top', scrub: true },
                         }
                     );
-                    gsap.from(card.querySelector('.astats__card-inner'), {
-                        rotate: i % 2 ? 4 : -4,
-                        scale: 0.9,
-                        autoAlpha: 0,
-                        duration: 1,
-                        ease: 'expo.out',
-                        scrollTrigger: { trigger: card, start: 'top 95%', once: true },
-                    });
                 });
             });
         }, sectionRef);
@@ -95,17 +112,33 @@ function AboutStats() {
             </div>
 
             <ul className="astats__field">
-                {STATS.map((stat, i) => (
+                {STATS.map((stat, i) => {
+                    const index = String(i + 1).padStart(2, '0');
+                    return (
                     <li key={stat.label} className={`astats__card astats__card--${i + 1}`}>
+                        {/* same playing-card face as "What We Do Relentlessly" */}
                         <div className="astats__card-inner">
+                            <span className="astats__index" aria-hidden="true">
+                                {index}
+                                <i className="astats__pip" />
+                            </span>
+                            <span className="astats__index astats__index--flip" aria-hidden="true">
+                                {index}
+                                <i className="astats__pip" />
+                            </span>
+
                             <span className="astats__value">{format(stat, stat.value)}</span>
+                            <span className="astats__rule" aria-hidden="true">
+                                <i className="astats__pip" />
+                            </span>
                             <span className="astats__text">
                                 <strong>{stat.label}</strong>
                                 <span>{stat.desc}</span>
                             </span>
                         </div>
                     </li>
-                ))}
+                    );
+                })}
             </ul>
         </section>
     );

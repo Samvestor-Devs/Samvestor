@@ -65,23 +65,122 @@
 .astats__card--4 { left: calc(658 * var(--fx)); top: calc(660 * var(--fx)); }
 .astats__card--5 { left: calc(551 * var(--fx)); top: calc(1160 * var(--fx)); }
 
+/* the same playing-card face as the cards in "What We Do Relentlessly"
+   (see AboutRelentless.css): card stock, an inset gold keyline, corner
+   numbers with a gold pip, and a foil sheen on hover */
 .astats__card-inner {
+    --astats-gold: #a8852f;
+    --astats-ink: var(--navy-900, #0b1a2e);
+    position: relative;
     height: 100%;
     box-sizing: border-box;
-    padding: calc(30 * var(--fx)) calc(24 * var(--fx)) calc(28 * var(--fx));
+    padding: calc(46 * var(--fx)) calc(24 * var(--fx));
     border-radius: calc(14 * var(--fx));
-    background: #ffffff;
-    color: var(--navy-900);
+    background:
+        radial-gradient(120% 70% at 50% 0%, rgba(255, 255, 255, 0.75), transparent 60%),
+        radial-gradient(90% 60% at 50% 110%, rgba(201, 168, 76, 0.12), transparent 70%),
+        var(--astats-card, #edf2f8);
+    color: var(--astats-ink);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    gap: calc(14 * var(--fx));
     text-align: center;
+    overflow: hidden;
     box-shadow: 0 calc(30 * var(--fx)) calc(60 * var(--fx)) rgba(0, 0, 0, 0.28);
 }
 
+:root[data-theme='light'] .astats__card-inner {
+    --astats-card: #fbf8ee;
+}
+
+.astats__card-inner::before {
+    content: '';
+    position: absolute;
+    inset: calc(8 * var(--fx));
+    border: 1.5px solid rgba(168, 133, 47, 0.45);
+    border-radius: calc(6 * var(--fx));
+    pointer-events: none;
+}
+
+/* foil sheen, swept across on hover */
+.astats__card-inner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        115deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.55) 48%,
+        rgba(201, 168, 76, 0.18) 52%,
+        transparent 65%
+    );
+    transform: translateX(-120%);
+    pointer-events: none;
+}
+
+.astats__index {
+    position: absolute;
+    top: calc(18 * var(--fx));
+    left: calc(20 * var(--fx));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(6 * var(--fx));
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: max(calc(16 * var(--fx)), 12px);
+    line-height: 1;
+    letter-spacing: 0.02em;
+}
+
+.astats__index--flip {
+    top: auto;
+    left: auto;
+    bottom: calc(18 * var(--fx));
+    right: calc(20 * var(--fx));
+    transform: rotate(180deg);
+}
+
+.astats__pip {
+    display: block;
+    width: calc(7 * var(--fx));
+    height: calc(7 * var(--fx));
+    min-width: 5px;
+    min-height: 5px;
+    background: var(--astats-gold);
+    transform: rotate(45deg);
+}
+
+.astats__rule {
+    display: flex;
+    align-items: center;
+    gap: calc(8 * var(--fx));
+    width: 56%;
+    transform-origin: 50% 50%;
+}
+
+.astats__rule::before,
+.astats__rule::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--astats-gold));
+}
+
+.astats__rule::after {
+    background: linear-gradient(90deg, var(--astats-gold), transparent);
+}
+
+@media (hover: hover) and (min-width: 901px) {
+    .astats__card-inner:hover::after {
+        transform: translateX(120%);
+        transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+}
+
 .astats__value {
-    margin-top: calc(38 * var(--fx));
     font-family: var(--font-body);
     font-weight: 800;
     font-size: calc(58 * var(--fx));
@@ -94,19 +193,26 @@
 .astats__text {
     display: flex;
     flex-direction: column;
-    gap: calc(4 * var(--fx));
+    gap: calc(6 * var(--fx));
     font-family: var(--font-body);
-    font-size: max(calc(18 * var(--fx)), 13px);
-    line-height: 1.25;
+    font-size: max(calc(16 * var(--fx)), 13px);
+    line-height: 1.3;
 }
 
+/* label reads as the card's title; the line under it is the gold sub, like
+   the cards below */
 .astats__text strong {
     font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
 .astats__text span {
     font-weight: 700;
-    opacity: 0.8;
+    font-size: max(calc(13 * var(--fx)), 11px);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--astats-gold);
 }
 
 /* ---- mobile (Figma 15:2254): heading, then a swipeable row ---- */

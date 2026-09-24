@@ -275,19 +275,36 @@
     min-height: auto;
     /* inline-size, not size: size containment would collapse an auto height */
     container-type: inline-size;
-    /* phones scroll the cards normally. The stack-over pin hid whatever sat
-       below the fold — including the expanded copy — because the next card
-       pinned to the same top edge and covered it. */
-    position: relative;
-    top: auto;
-    perspective: none;
+    /* phones keep the stack-over pin, so a card is genuinely covered by the
+       next one as it falls back (the recede lives in ServicesSection). A
+       collapsed card is shorter than the screen, so the cover hides nothing. */
+    position: sticky;
+    top: 0;
+    perspective: 1100px;
     overflow: visible;
   }
+
+  /* ...but an expanded card is taller than the screen, and a pinned element
+     can't reveal what sits below the fold — so opening one un-pins it */
+  .panel--open {
+    position: relative;
+    top: auto;
+  }
+
   .panel__card {
     position: relative;
     inset: auto;
     padding-top: 0;
-    transform: none !important; /* no 3D recede on mobile */
+    /* the recede is driven by GSAP on phones now; a
+       transform: none !important used to sit here and silently ate it */
+    will-change: transform;
+  }
+
+  /* short phones: trim the collapsed copy so a pinned card still fits */
+  @media (max-height: 760px) {
+    .panel__copy {
+      max-height: 6.2em;
+    }
   }
 
   .panel__inner {
