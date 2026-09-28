@@ -57,9 +57,9 @@ body:has(.svlab) .preloader {
     vertical-align: baseline;
 }
 
-/* the flat glyph holds the line's width from the start so nothing reflows;
-   it is only painted once the extrusion leaves the word */
-.svslot__flat {
+/* the glyph holds the line's width and wrapping but is never painted — the
+   extrusion is this letter, so its place stays empty either way */
+.svslot__space {
     visibility: hidden;
 }
 
@@ -104,16 +104,6 @@ body:has(.svlab) .preloader {
     background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
 }
 
-/* --- the overlay that covers the hand-off ----------------------- */
-
-.svwipe {
-    position: absolute;
-    inset: 0;
-    z-index: 5;
-    transform: scaleY(0);
-    transform-origin: 50% 100%;
-    background: linear-gradient(180deg, #0b1522 0%, #04080f 100%);
-}
 
 /* --- atmosphere ------------------------------------------------ */
 

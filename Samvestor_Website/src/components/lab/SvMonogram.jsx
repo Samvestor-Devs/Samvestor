@@ -34,6 +34,7 @@ const DOCK_CAMERA_Z = 12.2; // the letters are measured against this distance
 const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
 const range = (p, a, b) => clamp01((p - a) / (b - a));
 const ease = (t) => t * t * (3 - 2 * t); // smoothstep
+const easeOut = (t) => 1 - Math.pow(1 - t, 3); // quick away, long settle
 const mix = (a, b, t) => a + (b - a) * t;
 
 /** one glyph -> a bevelled, centred, upright extrusion */
@@ -61,17 +62,23 @@ function glyphGeometry(d, depth) {
 }
 
 /**
- * Where a letter has to sit, in world units, to land exactly on the flat
- * glyph it replaces in the headline.
+ * Where a letter has to sit, in world units, to land exactly on the empty
+ * slot it fills in the headline.
  *
- * The slot element carries a zero-width inline-block anchor whose bottom
- * edge sits on the text baseline and whose height is exactly 1em — so one
- * rect gives the pen position, the baseline and the em, with no font
- * metrics to guess at.
+ * The slot carries a zero-width inline-block anchor whose bottom edge sits
+ * on the text baseline and whose height is exactly 1em — so one rect gives
+ * the pen position, the baseline and the em, with no font metrics to guess
+ * at.
+ *
+ * Measured live, every frame, rather than cached: the line moves under the
+ * webfont landing, a resize, a zoom, and the heading's own entrance offset,
+ * and a letter standing in a word has to track all of it exactly. Two rect
+ * reads a frame, with no DOM writes in between, so nothing is invalidated.
  */
-function slotToWorld(rect, key, viewport) {
-    if (!rect) return null;
+function slotToWorld(el, key, viewport) {
+    if (!el) return null;
 
+    const rect = el.getBoundingClientRect();
     const em = rect.height;
     const box = GLYPH_BOX[key];
 
@@ -128,7 +135,9 @@ function Monogram({ progress, intro, slots, quality, pointer }) {
         const e = started ? clamp01((t - started) / INTRO.duration) : 0;
 
         const loading = 1 - ease(range(e, INTRO.holdEnd * 0.55, INTRO.backEnd)); // 1 while it stands alone
-        const toWord = ease(range(e, INTRO.wordStart, INTRO.wordEnd));
+        // the letters leave briskly and settle into the words, rather than
+        // easing in at both ends and looking like they are being placed
+        const toWord = easeOut(range(e, INTRO.wordStart, INTRO.wordEnd));
 
         // ---- life 3: the scroll ---------------------------------------
         const undock = ease(range(p, UNDOCK[0], UNDOCK[1]));
