@@ -28,6 +28,46 @@ import useMediaQuery from './useMediaQuery';
 const GOLD = new THREE.Color('#c9a84c');
 const GLASS = new THREE.Color('#f2e2b6');
 const CANVAS_BG = '#070b12';
+
+/* The heading's own gradient, copied from SvLab.css. A letter standing in a
+   word has to be that word's colour, not a gold object parked in front of
+   it — and since the ramp runs down the whole heading, the S high on the
+   first line and the V lower on the second are not the same colour. Each
+   letter is sampled at its own height.
+
+   Interpolated in sRGB, the way the browser paints the gradient. Doing it
+   in three's linear working space instead pulls the middle far darker than
+   the CSS it is supposed to match. */
+const TYPE_RAMP = [
+    { at: 0.12, rgb: [255, 246, 228] },
+    { at: 0.52, rgb: [227, 205, 149] },
+    { at: 1, rgb: [184, 151, 63] },
+];
+
+/** one scratch colour per letter, so the per-frame sampling allocates nothing */
+const INK = { S: new THREE.Color(), V: new THREE.Color() };
+
+function rampAt(t, out) {
+    const stops = TYPE_RAMP;
+    if (t <= stops[0].at) return out.setRGB(...stops[0].rgb.map((v) => v / 255), THREE.SRGBColorSpace);
+    const last = stops[stops.length - 1];
+    if (t >= last.at) return out.setRGB(...last.rgb.map((v) => v / 255), THREE.SRGBColorSpace);
+
+    for (let i = 0; i < stops.length - 1; i += 1) {
+        const a = stops[i];
+        const b = stops[i + 1];
+        if (t >= a.at && t <= b.at) {
+            const k = (t - a.at) / (b.at - a.at);
+            return out.setRGB(
+                (a.rgb[0] + (b.rgb[0] - a.rgb[0]) * k) / 255,
+                (a.rgb[1] + (b.rgb[1] - a.rgb[1]) * k) / 255,
+                (a.rgb[2] + (b.rgb[2] - a.rgb[2]) * k) / 255,
+                THREE.SRGBColorSpace
+            );
+        }
+    }
+    return out;
+}
 const CAMERA_FOV = 34;
 const DOCK_CAMERA_Z = 12.2; // the letters are measured against this distance
 
@@ -92,11 +132,23 @@ function slotToWorld(el, key, viewport) {
     const visibleH = 2 * Math.tan((CAMERA_FOV / 2) * (Math.PI / 180)) * DOCK_CAMERA_Z;
     const visibleW = visibleH * (viewport.width / viewport.height);
 
+    // where this letter falls in the heading's gradient, so it can wear the
+    // colour its neighbours are wearing on the same line
+    const head = el.closest('.svbeat__title');
+    const ink = INK[key]; // reused: this runs on every frame
+    if (head) {
+        const hr = head.getBoundingClientRect();
+        rampAt((cy - hr.top) / (hr.height || 1), ink);
+    } else {
+        rampAt(0.5, ink);
+    }
+
     return {
         x: (cx / viewport.width - 0.5) * visibleW,
         y: -(cy / viewport.height - 0.5) * visibleH,
         // geometry is 1000-unit em tall at scale 1, plus the bevel
         scale: ((h / viewport.height) * visibleH) / (box.y2 - box.y1 + BEVEL_SIZE * 2),
+        ink,
     };
 }
 
@@ -212,7 +264,10 @@ function Monogram({ progress, intro, slots, quality, pointer }) {
         const glass = quality.transmission
             ? ease(range(p, 0.29, 0.37)) * (1 - ease(range(p, 0.45, 0.53)))
             : 0;
-        for (const m of [sMat.current, vMat.current]) {
+        for (const [m, slot] of [
+            [sMat.current, slotS],
+            [vMat.current, slotV],
+        ]) {
             m.color.copy(GOLD).lerp(GLASS, glass);
             m.metalness = mix(0.94, 0, glass);
             m.roughness = mix(0.22, 0.04, glass);
@@ -223,6 +278,25 @@ function Monogram({ progress, intro, slots, quality, pointer }) {
             // keeps the glass state reading as the brand's gold, not as water
             m.attenuationDistance = mix(8, 1.6, glass);
             m.envMapIntensity = mix(1.15, 2.4, glass);
+
+            // ---- standing in a word: be the word ------------------------
+            // Lit metal in the middle of flat type reads as an object parked
+            // in front of the line rather than a letter of it. Docked, it
+            // gives up its metal and its reflections and lights itself in the
+            // heading's colour — flat type answers to no studio rig, so
+            // neither does this. Away from the words it is metal again, and
+            // everything in between is the travel.
+            const ink = slot ? slot.ink : null;
+            if (ink) {
+                m.color.lerp(ink, w);
+                m.emissive.copy(ink);
+            }
+            m.metalness = mix(m.metalness, 0.05, w);
+            m.roughness = mix(m.roughness, 0.7, w);
+            m.envMapIntensity = mix(m.envMapIntensity, 0.3, w);
+            // a little short of fully flat, so the bevel still catches an
+            // edge and the letter has somewhere to travel back from
+            m.emissiveIntensity = ink ? w * 0.78 : 0;
         }
 
         // ---- camera: real Z depth, not parallax -------------------------
@@ -247,6 +321,8 @@ function Monogram({ progress, intro, slots, quality, pointer }) {
         reflectivity: 0.9,
         attenuationColor: '#b8873a',
         attenuationDistance: 8,
+        emissive: '#e8d3a0',
+        emissiveIntensity: 0,
     };
 
     return (

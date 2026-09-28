@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { INTRO } from './svTiming';
+import { INTRO, UNDOCK } from './svTiming';
 import useMediaQuery from './useMediaQuery';
 import './SvLab.css';
 
@@ -25,6 +25,13 @@ const STATS = [
 ];
 
 const RAIL = ['The Mark', 'The Belief', 'The Proof', 'The Invitation'];
+
+/* The hero's copy — everything the opening fades in. Explicitly NOT the
+   scrim, which is a child of the same beat but is scheduled against the
+   scroll instead: fading it in with the copy would drop a dark veil over
+   the canvas, and the two letters standing in the headline sit under that
+   veil while every letter beside them sits above it. */
+const HERO_COPY = '.svbeat--hero > *:not(.svbeat__scrim)';
 
 /* When each beat owns the screen, as a fraction of the scroll track. The 3D
    choreography reads the same windows — one clock for both. */
@@ -89,7 +96,13 @@ function SvLab() {
             const beats = q('.svbeat');
 
             gsap.set(beats.slice(1), { autoAlpha: 0, y: 40 });
-            gsap.set([q('.svbeat--hero > *'), q('.svlab__chrome')], { autoAlpha: 0 });
+            gsap.set([q(HERO_COPY), q('.svlab__chrome')], { autoAlpha: 0 });
+            // The scrim is a dark veil over the canvas, and the two letters
+            // standing in the headline are UNDER it while every letter beside
+            // them is above it — which is exactly what made them look dull.
+            // While they are in the words there is nothing behind the copy to
+            // protect, so it starts at nothing and arrives with the monogram.
+            gsap.set(q('.svbeat--hero .svbeat__scrim'), { opacity: 0 });
 
             // ---- the opening, on the same clock as the scene -------------
             const d = INTRO.duration;
@@ -102,7 +115,7 @@ function SvLab() {
                 // the headline arrives first, with the two gaps already in it,
                 // so you watch the letters fly in and fill their own places
                 .fromTo(
-                    q('.svbeat--hero > *'),
+                    q(HERO_COPY),
                     { autoAlpha: 0, y: 22 },
                     { autoAlpha: 1, y: 0, duration: d * 0.16, stagger: d * 0.03, ease: 'power2.out' },
                     d * 0.48
@@ -150,6 +163,15 @@ function SvLab() {
             // the master timeline is exactly 1 long, so every position below
             // reads as a fraction of the whole track
             tl.to({}, { duration: 1 }, 0);
+
+            // ...and it fades in exactly as the letters leave and the mark
+            // forms up behind the heading
+            tl.fromTo(
+                q('.svbeat--hero .svbeat__scrim'),
+                { opacity: 0 },
+                { opacity: 1, duration: UNDOCK[1] - UNDOCK[0], ease: 'power1.in' },
+                UNDOCK[0]
+            );
 
             beats.forEach((beat, i) => {
                 const win = BEATS[i];
