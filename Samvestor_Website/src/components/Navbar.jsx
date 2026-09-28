@@ -143,7 +143,13 @@ function Navbar() {
         // already home — smooth-scroll to the section instead of jumping
         event.preventDefault();
         const target = document.querySelector(href);
-        if (target) {
+        if (!target) return;
+
+        // go through Lenis where it runs (desktop), or the two fight over the
+        // scroll position; native smooth scrolling everywhere else
+        if (window.__lenis) {
+            window.__lenis.scrollTo(target, { offset: 0 });
+        } else {
             target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     };

@@ -211,7 +211,7 @@ function AboutHeroGlobe() {
           trigger: sectionRef.current,
           start: 'top top',
           end: 'bottom bottom',
-          scrub: 1,
+          scrub: 0.3, // Lenis smooths the scroll itself on desktop
           // the wordmark's rise is a share of the screen height
           invalidateOnRefresh: true,
           onUpdate: (self) => {

@@ -24,12 +24,17 @@ function ServicePanel({ number, title, paragraphs, image, bg, light = {}, accent
     const { style } = document.body;
     const prev = style.overflow;
     style.overflow = 'hidden';
+    // body overflow alone does not stop Lenis, which drives the scroll
+    // position itself (desktop only, but the sheet is reachable there by
+    // narrowing the window)
+    window.__lenis?.stop();
     const onKey = (e) => {
       if (e.key === 'Escape') setOpen(false);
     };
     window.addEventListener('keydown', onKey);
     return () => {
       style.overflow = prev;
+      window.__lenis?.start();
       window.removeEventListener('keydown', onKey);
     };
   }, [open]);

@@ -28,7 +28,10 @@ function AboutSection() {
         trigger: sectionRef.current,
         start: 'top top',
         end: 'bottom bottom',
-        scrub: 1, // 1s smoothing so motion eases toward the scroll position
+        // 0.3, not 1: Lenis already smooths the scroll itself on desktop, and
+        // a second of lag on top of that makes the words feel like they are
+        // wading (see SmoothScroll.jsx)
+        scrub: 0.3,
         invalidateOnRefresh: true, // re-read window width on resize
       };
 

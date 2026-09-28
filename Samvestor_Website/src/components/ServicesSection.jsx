@@ -139,7 +139,8 @@ function ServicesSection() {
             // values mid-scroll, so a resize while tilted left cards stuck tilted.
             start: () => `top+=${i * window.innerHeight} top`, // this panel pins
             end: () => '+=' + window.innerHeight, // next card fully covers it
-            scrub: 1, // 1s smoothing — eases toward the scroll position
+            // kept short because Lenis smooths the scroll itself on desktop
+            scrub: 0.3,
           },
         });
 

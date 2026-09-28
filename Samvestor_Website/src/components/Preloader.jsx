@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './Preloader.css';
 
 const logo = '/sv-logo.png';
@@ -31,6 +32,16 @@ function Preloader({ onFinish }) {
     const finish = window.setTimeout(() => {
       setHidden(true);
       document.body.style.overflow = prevOverflow;
+
+      // Every scroll animation on the page was measured while this splash
+      // held the page still, so their start/end positions were computed
+      // against a document that could not scroll. Remeasure now that it can,
+      // or sections sit at the wrong end of their timeline until the first
+      // scroll jerks them into place (the Who It's For cards did exactly
+      // that: resting on screen, then snapping down to start).
+      ScrollTrigger.refresh();
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+
       onFinish?.();
     }, holdFor + exitFor);
 

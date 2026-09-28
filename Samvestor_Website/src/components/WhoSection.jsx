@@ -71,8 +71,16 @@ function WhoSection() {
         // rise from 172% of a card's height below its resting spot (720px on
         // the 1440 frame) — a percentage, so the distance scales with the
         // fluid cards without re-measuring on resize
-        cards.forEach((card) => {
-          tl.from(card, { yPercent: 122, autoAlpha: 0, rotation: 0, duration: 1 }, '+=0.4');
+        // fromTo, not from: both ends are written down, so the cards can
+        // never be left sitting at their resting spot by a render that
+        // happened before the trigger knew where it started
+        cards.forEach((card, i) => {
+          tl.fromTo(
+            card,
+            { yPercent: 122, autoAlpha: 0, rotation: 0, immediateRender: true },
+            { yPercent: -50, autoAlpha: 1, rotation: CARDS[i].rot, duration: 1 },
+            '+=0.4'
+          );
         });
 
         // recalculate once everything (incl. fonts) has settled

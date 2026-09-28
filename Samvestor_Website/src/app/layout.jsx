@@ -4,6 +4,7 @@ import '../index.css';
 import '../App.css';
 import Navbar from '../components/Navbar';
 import Preloader from '../components/Preloader';
+import SmoothScroll from '../components/SmoothScroll';
 
 /* Self-hosted by Next — no external Google Fonts request, and the same
    faces render on every device. Exposed as CSS variables consumed by
@@ -44,6 +45,7 @@ export default function RootLayout({ children }) {
                 </Script>
                 {/* #root keeps the layout rules the sections were built against */}
                 <div id="root">
+                    <SmoothScroll />
                     <Preloader />
                     <Navbar />
                     {children}

@@ -89,7 +89,7 @@ function AboutRelentless() {
                         trigger: section,
                         start: i === 0 ? 'top 85%' : 'top 30%',
                         end: i === 0 ? 'top -10%' : 'bottom bottom',
-                        scrub: 1,
+                        scrub: 0.3, // Lenis smooths the scroll itself on desktop
                     },
                 });
             });
@@ -118,7 +118,7 @@ function AboutRelentless() {
                         start: 'center 55%',
                         endTrigger: q('.arel__grid')[0],
                         end: 'top 20%',
-                        scrub: 1,
+                        scrub: 0.3, // Lenis smooths the scroll itself on desktop
                         invalidateOnRefresh: true,
                     },
                 });
