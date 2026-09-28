@@ -5,6 +5,8 @@ import dynamic from 'next/dynamic';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { INTRO, UNDOCK } from './svTiming';
+import { inkGradient } from './svInk';
+import useTheme from '../../lib/useTheme';
 import useMediaQuery from './useMediaQuery';
 import './SvLab.css';
 
@@ -70,6 +72,10 @@ function SvLab() {
     const intro = useRef({ running: false, start: 0 });
     const slots = useRef({ S: null, V: null });
     const staticMode = useMediaQuery('(prefers-reduced-motion: reduce)');
+    const theme = useTheme();
+    // painted from the same stops the 3D letters sample, so the flat glyphs
+    // and the extrusions standing between them can never disagree
+    const inkStyle = { backgroundImage: inkGradient(theme) };
 
     /* The scene is handed the anchor ELEMENTS, not their measurements, and
        reads them itself on every frame. A rect taken once is stale the moment
@@ -121,6 +127,12 @@ function SvLab() {
                     d * 0.48
                 )
                 .to(q('.svlab__chrome'), { autoAlpha: 1, duration: d * 0.14 }, d * 0.88);
+
+            // The site header is fixed and lives outside this page, so during
+            // the opening it sits on top of the mark that IS the preloader.
+            // It waits with everything else and arrives with the chrome.
+            document.body.classList.add('svlab-opening');
+            open.eventCallback('onComplete', () => document.body.classList.remove('svlab-opening'));
 
             const start = () => {
                 intro.current.running = true;
@@ -210,7 +222,10 @@ function SvLab() {
             return () => mo?.disconnect();
         }, rootRef);
 
-        return () => ctx.revert();
+        return () => {
+            document.body.classList.remove('svlab-opening');
+            ctx.revert();
+        };
     }, [staticMode]);
 
     return (
@@ -228,7 +243,7 @@ function SvLab() {
                         <p className="svbeat__eyebrow">Samvestor</p>
                         {/* the two glyphs are never painted, so the heading is
                             labelled rather than read off the text */}
-                        <h1 className="svbeat__title" aria-label="Be A Smart Investor">
+                        <h1 className="svbeat__title" style={inkStyle} aria-label="Be A Smart Investor">
                             <span aria-hidden="true">
                                 Be A <Slot letter="S" />
                                 mart
@@ -283,7 +298,7 @@ function SvLab() {
                     <section className="svbeat svbeat--center">
                         <span className="svbeat__scrim" aria-hidden="true" />
                         <p className="svbeat__eyebrow">What happens next</p>
-                        <h2 className="svbeat__title svbeat__title--close">
+                        <h2 className="svbeat__title svbeat__title--close" style={inkStyle}>
                             Growth measured
                             <br />
                             in crores

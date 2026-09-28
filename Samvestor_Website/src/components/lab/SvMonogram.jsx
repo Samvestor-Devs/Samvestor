@@ -7,6 +7,8 @@ import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 import * as THREE from 'three';
 import { SV_GLYPHS, GLYPH_BOX, BEVEL_SIZE, GLYPH_SCALE } from './svGlyphs';
 import { INTRO, UNDOCK } from './svTiming';
+import { inkAt } from './svInk';
+import useTheme from '../../lib/useTheme';
 import useMediaQuery from './useMediaQuery';
 
 /* ============================================================
@@ -25,48 +27,63 @@ import useMediaQuery from './useMediaQuery';
    run on a clock, because nobody has scrolled yet.
    ============================================================ */
 
-const GOLD = new THREE.Color('#c9a84c');
+/* The metal, per theme. Against an off-white stage the dark-mode gold
+   washes out to cream — a polished surface is a picture of its
+   surroundings, and those surroundings just got much brighter — so the
+   light stage gets a deeper alloy rather than a brighter rig. */
+const GOLD = { dark: new THREE.Color('#c9a84c'), light: new THREE.Color('#8f7226') };
 const GLASS = new THREE.Color('#f2e2b6');
-const CANVAS_BG = '#070b12';
+const BLACK = new THREE.Color(0, 0, 0);
 
-/* The heading's own gradient, copied from SvLab.css. A letter standing in a
-   word has to be that word's colour, not a gold object parked in front of
-   it — and since the ramp runs down the whole heading, the S high on the
-   first line and the V lower on the second are not the same colour. Each
-   letter is sampled at its own height.
+/* the stage behind the mark, per theme */
+const STAGE = { dark: '#070b12', light: '#f4f1ea' };
 
-   Interpolated in sRGB, the way the browser paints the gradient. Doing it
-   in three's linear working space instead pulls the middle far darker than
-   the CSS it is supposed to match. */
-const TYPE_RAMP = [
-    { at: 0.12, rgb: [255, 246, 228] },
-    { at: 0.52, rgb: [227, 205, 149] },
-    { at: 1, rgb: [184, 151, 63] },
-];
+/* Scratch colours: the ramp is sampled every frame, for each letter, at
+   three heights (its top, middle and foot), so none of this allocates. */
+const INK = {
+    S: { top: new THREE.Color(), mid: new THREE.Color(), bot: new THREE.Color() },
+    V: { top: new THREE.Color(), mid: new THREE.Color(), bot: new THREE.Color() },
+};
 
-/** one scratch colour per letter, so the per-frame sampling allocates nothing */
-const INK = { S: new THREE.Color(), V: new THREE.Color() };
+/**
+ * Gives each letter the heading's vertical gradient.
+ *
+ * Emissive is what a docked letter is mostly lit by — flat type answers to
+ * no studio rig, so neither does this — but emissive is a single colour per
+ * material, which left the letter flat while every glyph beside it ran from
+ * cream at the cap to gold at the foot. This multiplies it by a ramp keyed
+ * to height in the glyph's own local space, so no extra vertex attribute is
+ * needed: `position` is already there, and the glyph's extent is a uniform.
+ *
+ * The ratio is relative to the letter's middle, which the material is
+ * already wearing, so when the letter is away being metal and emissive is
+ * off, this contributes nothing.
+ */
+function patchInkRamp(shader, uniforms) {
+    Object.assign(shader.uniforms, uniforms);
 
-function rampAt(t, out) {
-    const stops = TYPE_RAMP;
-    if (t <= stops[0].at) return out.setRGB(...stops[0].rgb.map((v) => v / 255), THREE.SRGBColorSpace);
-    const last = stops[stops.length - 1];
-    if (t >= last.at) return out.setRGB(...last.rgb.map((v) => v / 255), THREE.SRGBColorSpace);
+    shader.vertexShader = shader.vertexShader
+        .replace('void main() {', 'uniform float uYTop;\nuniform float uYSpan;\nvarying float vInkH;\nvoid main() {')
+        .replace(
+            '#include <begin_vertex>',
+            '#include <begin_vertex>\n\tvInkH = clamp((uYTop - position.y) / uYSpan, 0.0, 1.0);'
+        );
 
-    for (let i = 0; i < stops.length - 1; i += 1) {
-        const a = stops[i];
-        const b = stops[i + 1];
-        if (t >= a.at && t <= b.at) {
-            const k = (t - a.at) / (b.at - a.at);
-            return out.setRGB(
-                (a.rgb[0] + (b.rgb[0] - a.rgb[0]) * k) / 255,
-                (a.rgb[1] + (b.rgb[1] - a.rgb[1]) * k) / 255,
-                (a.rgb[2] + (b.rgb[2] - a.rgb[2]) * k) / 255,
-                THREE.SRGBColorSpace
-            );
-        }
-    }
-    return out;
+    shader.fragmentShader = shader.fragmentShader
+        .replace('void main() {', 'uniform vec3 uRampTop;\nuniform vec3 uRampBot;\nvarying float vInkH;\nvoid main() {')
+        .replace(
+            'vec3 totalEmissiveRadiance = emissive;',
+            'vec3 totalEmissiveRadiance = emissive * mix(uRampTop, uRampBot, vInkH);'
+        );
+}
+
+/** ramp stop / middle, guarding the divide when a channel is near zero */
+function ratio(out, stop, mid) {
+    return out.setRGB(
+        stop.r / Math.max(mid.r, 1e-4),
+        stop.g / Math.max(mid.g, 1e-4),
+        stop.b / Math.max(mid.b, 1e-4)
+    );
 }
 const CAMERA_FOV = 34;
 const DOCK_CAMERA_Z = 12.2; // the letters are measured against this distance
@@ -98,6 +115,7 @@ function glyphGeometry(d, depth) {
     // gold would light from inside out.
     geo.rotateX(Math.PI);
     geo.computeVertexNormals();
+    geo.computeBoundingBox(); // the ink ramp is keyed to the glyph's extent
     return geo;
 }
 
@@ -115,7 +133,7 @@ function glyphGeometry(d, depth) {
  * and a letter standing in a word has to track all of it exactly. Two rect
  * reads a frame, with no DOM writes in between, so nothing is invalidated.
  */
-function slotToWorld(el, key, viewport) {
+function slotToWorld(el, key, viewport, theme) {
     if (!el) return null;
 
     const rect = el.getBoundingClientRect();
@@ -132,16 +150,18 @@ function slotToWorld(el, key, viewport) {
     const visibleH = 2 * Math.tan((CAMERA_FOV / 2) * (Math.PI / 180)) * DOCK_CAMERA_Z;
     const visibleW = visibleH * (viewport.width / viewport.height);
 
-    // where this letter falls in the heading's gradient, so it can wear the
-    // colour its neighbours are wearing on the same line
+    // Where this letter falls in the heading's gradient, so it wears what
+    // its neighbours on the same line are wearing — the S high on the first
+    // line and the V lower on the second are not the same colour. Sampled at
+    // the glyph's cap, middle and foot, so it carries the ramp within itself
+    // as well.
     const head = el.closest('.svbeat__title');
     const ink = INK[key]; // reused: this runs on every frame
-    if (head) {
-        const hr = head.getBoundingClientRect();
-        rampAt((cy - hr.top) / (hr.height || 1), ink);
-    } else {
-        rampAt(0.5, ink);
-    }
+    const hr = head ? head.getBoundingClientRect() : null;
+    const at = (edge) => (hr ? (edge - hr.top) / (hr.height || 1) : 0.5);
+    inkAt(theme, at(cy - h / 2), ink.top);
+    inkAt(theme, at(cy), ink.mid);
+    inkAt(theme, at(cy + h / 2), ink.bot);
 
     return {
         x: (cx / viewport.width - 0.5) * visibleW,
@@ -152,7 +172,7 @@ function slotToWorld(el, key, viewport) {
     };
 }
 
-function Monogram({ progress, intro, slots, quality, pointer }) {
+function Monogram({ progress, intro, slots, quality, pointer, theme }) {
     const group = useRef(null);
     const sRef = useRef(null);
     const vRef = useRef(null);
@@ -162,6 +182,17 @@ function Monogram({ progress, intro, slots, quality, pointer }) {
     const startedAt = useRef(0);
 
     const [geoS, geoV] = useMemo(() => [glyphGeometry(SV_GLYPHS.S, 200), glyphGeometry(SV_GLYPHS.V, 200)], []);
+
+    /* one set per letter: the shader program is shared, the values are not */
+    const ramp = useMemo(() => {
+        const make = (geo) => ({
+            uYTop: { value: geo.boundingBox.max.y },
+            uYSpan: { value: geo.boundingBox.max.y - geo.boundingBox.min.y || 1 },
+            uRampTop: { value: new THREE.Color(1, 1, 1) },
+            uRampBot: { value: new THREE.Color(1, 1, 1) },
+        });
+        return { S: make(geoS), V: make(geoV) };
+    }, [geoS, geoV]);
 
     useEffect(
         () => () => {
@@ -242,8 +273,8 @@ function Monogram({ progress, intro, slots, quality, pointer }) {
         g.scale.setScalar(mix(1, sc, free));
 
         // ---- the letters ------------------------------------------------
-        const slotS = slotToWorld(slots.current.S, 'S', size);
-        const slotV = slotToWorld(slots.current.V, 'V', size);
+        const slotS = slotToWorld(slots.current.S, 'S', size, theme);
+        const slotV = slotToWorld(slots.current.V, 'V', size, theme);
 
         const place = (mesh, slot, homeX) => {
             const wl = slot ? w : 0; // no measurement yet: stay a monogram
@@ -264,11 +295,18 @@ function Monogram({ progress, intro, slots, quality, pointer }) {
         const glass = quality.transmission
             ? ease(range(p, 0.29, 0.37)) * (1 - ease(range(p, 0.45, 0.53)))
             : 0;
-        for (const [m, slot] of [
-            [sMat.current, slotS],
-            [vMat.current, slotV],
+        // The colour changes on a tighter curve than the travel does. Run on
+        // `w` itself, the letters spend most of a long flight as a pale
+        // half-thing that reads as neither type nor metal; held back to the
+        // last stretch, they are clearly one or the other almost the whole
+        // way, and still cross over smoothly.
+        const ink = ease(range(w, 0.52, 0.97));
+
+        for (const [m, slot, uni] of [
+            [sMat.current, slotS, ramp.S],
+            [vMat.current, slotV, ramp.V],
         ]) {
-            m.color.copy(GOLD).lerp(GLASS, glass);
+            m.color.copy(theme === 'light' ? GOLD.light : GOLD.dark).lerp(GLASS, glass);
             m.metalness = mix(0.94, 0, glass);
             m.roughness = mix(0.22, 0.04, glass);
             m.transmission = glass;
@@ -286,17 +324,25 @@ function Monogram({ progress, intro, slots, quality, pointer }) {
             // heading's colour — flat type answers to no studio rig, so
             // neither does this. Away from the words it is metal again, and
             // everything in between is the travel.
-            const ink = slot ? slot.ink : null;
-            if (ink) {
-                m.color.lerp(ink, w);
-                m.emissive.copy(ink);
+            if (slot) {
+                // Docked, the diffuse is taken all the way out and the letter
+                // is ONLY its own emission. A lit surface plus a full emission
+                // adds up to half again the colour it is supposed to be, which
+                // is what left the docked letters looking bleached beside the
+                // flat glyphs. With no diffuse there is nothing to add, and
+                // the match stops depending on the rig — or on the theme,
+                // whose stages are lit very differently.
+                m.color.lerp(BLACK, ink);
+                m.emissive.copy(slot.ink.mid);
+                ratio(uni.uRampTop.value, slot.ink.top, slot.ink.mid);
+                ratio(uni.uRampBot.value, slot.ink.bot, slot.ink.mid);
             }
-            m.metalness = mix(m.metalness, 0.05, w);
-            m.roughness = mix(m.roughness, 0.7, w);
-            m.envMapIntensity = mix(m.envMapIntensity, 0.3, w);
-            // a little short of fully flat, so the bevel still catches an
-            // edge and the letter has somewhere to travel back from
-            m.emissiveIntensity = ink ? w * 0.78 : 0;
+            m.metalness = mix(m.metalness, 0.05, ink);
+            m.roughness = mix(m.roughness, 0.7, ink);
+            m.envMapIntensity = mix(m.envMapIntensity, 0.28, ink);
+            // just over 1: ACES pulls a bright emission down a little, so
+            // feeding it slightly hot lands on the flat colour
+            m.emissiveIntensity = slot ? ink * 1.12 : 0;
         }
 
         // ---- camera: real Z depth, not parallax -------------------------
@@ -328,10 +374,24 @@ function Monogram({ progress, intro, slots, quality, pointer }) {
     return (
         <group ref={group}>
             <mesh ref={sRef} geometry={geoS} scale={GLYPH_SCALE}>
-                <meshPhysicalMaterial ref={sMat} color={GOLD} metalness={0.94} roughness={0.22} {...material} />
+                <meshPhysicalMaterial
+                    ref={sMat}
+                    color={GOLD.dark}
+                    metalness={0.94}
+                    roughness={0.22}
+                    onBeforeCompile={(shader) => patchInkRamp(shader, ramp.S)}
+                    {...material}
+                />
             </mesh>
             <mesh ref={vRef} geometry={geoV} scale={GLYPH_SCALE}>
-                <meshPhysicalMaterial ref={vMat} color={GOLD} metalness={0.94} roughness={0.22} {...material} />
+                <meshPhysicalMaterial
+                    ref={vMat}
+                    color={GOLD.dark}
+                    metalness={0.94}
+                    roughness={0.22}
+                    onBeforeCompile={(shader) => patchInkRamp(shader, ramp.V)}
+                    {...material}
+                />
             </mesh>
         </group>
     );
@@ -343,9 +403,23 @@ function Monogram({ progress, intro, slots, quality, pointer }) {
  * something to reflect or the letters read as black cut-outs. The broad
  * panels fill the faces; the narrow strips rake across the bevels as it turns.
  */
-function Rig() {
+function Rig({ theme }) {
+    const light = theme === 'light';
     return (
         <Environment resolution={320}>
+            {/* The light stage's black cards. Metal reads as metal because of
+                the DARK bands in what it reflects, not the bright ones — an
+                all-bright surround gives a uniform reflection and the letters
+                come out as flat yellow cut-outs. The dark stage has these for
+                free, being mostly dark already. */}
+            {light && (
+                <>
+                    <Lightformer form="rect" intensity={0.05} color="#161b26" position={[-9, 0, 4]} scale={[7, 18, 1]} target={[0, 0, 0]} />
+                    <Lightformer form="rect" intensity={0.05} color="#161b26" position={[9, 2, 4]} scale={[6, 18, 1]} target={[0, 0, 0]} />
+                    <Lightformer form="rect" intensity={0.08} color="#1d2430" position={[0, -9, 6]} scale={[18, 6, 1]} target={[0, 0, 0]} />
+                </>
+            )}
+
             {/* kept warm and well short of white — a bright panel blows gold
                 out to grey */}
             <Lightformer form="rect" intensity={2.4} color="#ffe2ae" position={[-7, 5, 9]} scale={[16, 16, 1]} target={[0, 0, 0]} />
@@ -360,24 +434,43 @@ function Rig() {
 }
 
 function Scene(props) {
-    const { quality } = props;
+    const { quality, theme } = props;
+    const light = theme === 'light';
+    const stage = light ? STAGE.light : STAGE.dark;
+
     return (
         <>
-            <color attach="background" args={[CANVAS_BG]} />
-            <fog attach="fog" args={[CANVAS_BG, 13, 38]} />
+            <color attach="background" args={[stage]} />
+            <fog attach="fog" args={[stage, 13, 38]} />
 
-            <Rig />
-            <ambientLight intensity={0.35} />
-            <spotLight position={[7, 9, 9]} angle={0.35} penumbra={1} intensity={90} color="#fff2d6" />
+            <Rig theme={theme} />
+            <ambientLight intensity={light ? 0.9 : 0.35} />
+            <spotLight position={[7, 9, 9]} angle={0.35} penumbra={1} intensity={light ? 150 : 90} color="#fff2d6" />
             <pointLight position={[-8, -3, 4]} intensity={40} color="#4a6fa5" />
 
             <Monogram {...props} />
 
             {quality.sparkles > 0 && (
-                <Sparkles count={quality.sparkles} scale={[16, 10, 9]} size={2.4} speed={0.25} opacity={0.5} color="#eed9a0" />
+                <Sparkles
+                    count={quality.sparkles}
+                    scale={[16, 10, 9]}
+                    size={2.4}
+                    speed={0.25}
+                    opacity={light ? 0.75 : 0.5}
+                    color={light ? '#8a6a1f' : '#eed9a0'}
+                />
             )}
 
-            <ContactShadows position={[0, -3.4, 0]} opacity={0.5} scale={22} blur={2.8} far={6} color="#000000" />
+            {/* the mark casts onto a light stage; on a near-black one there is
+                nothing for a shadow to darken */}
+            <ContactShadows
+                position={[0, -3.4, 0]}
+                opacity={light ? 0.34 : 0.5}
+                scale={22}
+                blur={2.8}
+                far={6}
+                color="#000000"
+            />
         </>
     );
 }
@@ -390,16 +483,20 @@ function Scene(props) {
 function SvMonogram({ progress, intro, slots }) {
     const pointer = useRef({ x: 0, y: 0 });
     const small = useMediaQuery('(max-width: 900px)');
+    const theme = useTheme();
 
     const quality = useMemo(
         () => ({
             compact: small,
-            // transmission renders the whole scene a second time — desktop only
-            transmission: !small,
+            // Transmission renders the whole scene a second time — desktop
+            // only. And only on the dark stage: glass refracts whatever is
+            // behind it, so against an off-white page it turns the mark
+            // near-white and the moment simply reads as the letters vanishing.
+            transmission: !small && theme !== 'light',
             sparkles: small ? 0 : 60,
             dpr: small ? [1, 1.5] : [1, 1.9],
         }),
-        [small]
+        [small, theme]
     );
 
     useEffect(() => {
@@ -420,7 +517,7 @@ function SvMonogram({ progress, intro, slots }) {
             gl={{ antialias: true, powerPreference: 'high-performance', toneMappingExposure: 0.92 }}
             camera={{ position: [0, 0, 17.5], fov: CAMERA_FOV }}
         >
-            <Scene progress={progress} intro={intro} slots={slots} quality={quality} pointer={pointer} />
+            <Scene progress={progress} intro={intro} slots={slots} quality={quality} pointer={pointer} theme={theme} />
         </Canvas>
     );
 }
