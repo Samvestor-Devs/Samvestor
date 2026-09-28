@@ -1,0 +1,541 @@
+/* ============================================================
+   SV monogram concept — a pinned stage with a WebGL monogram
+   behind four beats of the site's own copy.
+
+   Deliberately theme-independent: the scene is lit for a dark
+   stage, so the page keeps its own canvas colour whatever the
+   site theme is set to.
+   ============================================================ */
+
+.svlab {
+    --stage: #070b12;
+    --ink: #f4f1ea;
+    --ink-dim: rgba(244, 241, 234, 0.62);
+    --hair: rgba(201, 168, 76, 0.28);
+
+    position: relative;
+    background: var(--stage);
+    color: var(--ink);
+}
+
+/* the stage pins itself while the track below scrolls past */
+.svlab__stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: clip;
+}
+
+.svlab__track {
+    height: 460vh;
+}
+
+.svlab__canvas {
+    position: absolute !important;
+    inset: 0;
+    z-index: 0;
+}
+
+/* this page brings its own preloader — the monogram — so the site's one
+   would only load it twice */
+body:has(.svlab) .preloader {
+    display: none;
+}
+
+/* --- the letters the 3D glyphs stand in for --------------------- */
+
+.svslot {
+    position: relative;
+}
+
+/* zero-width, 1em tall, sitting on the baseline: one rect gives the scene
+   the pen position, the baseline and the em */
+.svslot__anchor {
+    display: inline-block;
+    width: 0;
+    height: 1em;
+    vertical-align: baseline;
+}
+
+/* the flat glyph holds the line's width from the start so nothing reflows;
+   it is only painted once the extrusion leaves the word */
+.svslot__flat {
+    visibility: hidden;
+}
+
+/* --- the loading state the mark arrives in ---------------------- */
+
+.svload {
+    position: absolute;
+    left: 50%;
+    bottom: calc(96 * var(--fx));
+    transform: translateX(-50%);
+    z-index: 4;
+    display: grid;
+    justify-items: center;
+    gap: calc(16 * var(--fx));
+}
+
+.svload__label {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: max(calc(11 * var(--fx)), 10px);
+    font-weight: 600;
+    letter-spacing: 0.44em;
+    text-transform: uppercase;
+    color: rgba(244, 241, 234, 0.55);
+}
+
+.svload__count::after {
+    content: '%';
+}
+
+.svload__bar {
+    width: calc(220 * var(--fx));
+    height: 1px;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.svload__bar-fill {
+    display: block;
+    height: 100%;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
+}
+
+/* --- the overlay that covers the hand-off ----------------------- */
+
+.svwipe {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    transform: scaleY(0);
+    transform-origin: 50% 100%;
+    background: linear-gradient(180deg, #0b1522 0%, #04080f 100%);
+}
+
+/* --- atmosphere ------------------------------------------------ */
+
+/* film grain: one tiny generated tile, tiled and blended over everything */
+.svlab__grain {
+    position: absolute;
+    inset: -50%;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.32;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    animation: svlab-grain 1.1s steps(3) infinite;
+}
+
+@keyframes svlab-grain {
+    0% { transform: translate3d(0, 0, 0); }
+    33% { transform: translate3d(-2%, 1.5%, 0); }
+    66% { transform: translate3d(1.5%, -1%, 0); }
+    100% { transform: translate3d(0, 0, 0); }
+}
+
+.svlab__vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        radial-gradient(120% 90% at 50% 45%, transparent 38%, rgba(3, 6, 12, 0.72) 100%),
+        linear-gradient(180deg, rgba(3, 6, 12, 0.55) 0%, transparent 22%, transparent 74%, rgba(3, 6, 12, 0.8) 100%);
+}
+
+/* --- beats ------------------------------------------------------ */
+
+.svlab__beats {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+}
+
+.svbeat {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: calc(96 * var(--fx)) calc(110 * var(--fx));
+    /* the monogram behind has to stay readable — only the copy takes clicks */
+    pointer-events: none;
+}
+
+.svbeat > * {
+    pointer-events: auto;
+}
+
+/* Each beat brings its own scrim. Polished gold is high-contrast in both
+   directions, so copy laid straight over it flickers between legible and not
+   as the object turns — the gradient sits between the two. It is a real
+   element rather than a pseudo so it fades with the beat's own copy, which
+   matters during the opening: the mark has to load over a clean stage. */
+.svbeat__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.svbeat--center {
+    align-items: center;
+    text-align: center;
+}
+
+.svbeat--center .svbeat__scrim {
+    background: radial-gradient(64% 46% at 50% 52%, rgba(4, 8, 15, 0.86) 0%, rgba(4, 8, 15, 0.52) 55%, transparent 100%);
+}
+
+.svbeat--left {
+    align-items: flex-start;
+    max-width: calc(760 * var(--fx));
+}
+
+.svbeat--left .svbeat__scrim {
+    /* the beat is clipped to its own max-width, so the scrim is drawn wider */
+    left: calc(-110 * var(--fx));
+    right: calc(-260 * var(--fx));
+    background: linear-gradient(90deg, rgba(4, 8, 15, 0.92) 0%, rgba(4, 8, 15, 0.82) 42%, transparent 88%);
+}
+
+/* the monogram steps left for this one, so the proof sits on the right —
+   with room kept clear for the rail, which lives in that same corner */
+.svbeat--right {
+    align-items: flex-start;
+    padding-left: 50%;
+    padding-right: calc(226 * var(--fx));
+}
+
+.svbeat--right .svbeat__scrim {
+    background: linear-gradient(270deg, rgba(4, 8, 15, 0.92) 0%, rgba(4, 8, 15, 0.8) 44%, transparent 86%);
+}
+
+.svbeat__eyebrow {
+    margin: 0 0 calc(20 * var(--fx));
+    font-family: var(--font-body);
+    font-size: max(calc(12 * var(--fx)), 11px);
+    font-weight: 600;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+.svbeat__title {
+    margin: 0;
+    font-family: var(--font-accent);
+    font-weight: 400;
+    font-size: calc(132 * var(--fs));
+    line-height: 0.88;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    background: linear-gradient(180deg, #fff6e4 12%, #e3cd95 52%, #b8973f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 calc(18 * var(--fx)) calc(60 * var(--fx)) rgba(0, 0, 0, 0.55);
+}
+
+.svbeat__title--close {
+    font-size: calc(112 * var(--fs));
+}
+
+.svbeat__head {
+    margin: 0 0 calc(44 * var(--fx));
+    font-family: var(--font-accent);
+    font-weight: 400;
+    font-size: calc(62 * var(--fs));
+    line-height: 0.96;
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.svbeat__quote {
+    margin: 0 0 calc(30 * var(--fx));
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: calc(56 * var(--fs));
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+}
+
+.svbeat__quote em {
+    font-style: normal;
+    color: var(--gold-light);
+}
+
+.svbeat__rule {
+    display: block;
+    width: calc(120 * var(--fx));
+    height: 1px;
+    margin: calc(34 * var(--fx)) 0;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.svbeat__sub {
+    margin: 0;
+    max-width: calc(520 * var(--fx));
+    font-family: var(--font-body);
+    font-size: max(calc(17 * var(--fx)), 15px);
+    line-height: 1.6;
+    color: var(--ink-dim);
+}
+
+.svbeat--center .svbeat__sub {
+    margin-inline: auto;
+}
+
+.svbeat__cue {
+    position: absolute;
+    left: 50%;
+    bottom: calc(54 * var(--fx));
+    transform: translateX(-50%);
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: max(calc(11 * var(--fx)), 10px);
+    font-weight: 600;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    animation: svlab-cue 2.4s ease-in-out infinite;
+}
+
+@keyframes svlab-cue {
+    0%, 100% { opacity: 0.3; transform: translate(-50%, 0); }
+    50% { opacity: 0.9; transform: translate(-50%, 6px); }
+}
+
+.svbeat__cta {
+    margin-top: calc(38 * var(--fx));
+    padding: calc(16 * var(--fx)) calc(40 * var(--fx));
+    border: 1px solid var(--gold);
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: max(calc(14 * var(--fx)), 13px);
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--gold-light);
+    background: rgba(201, 168, 76, 0.06);
+    backdrop-filter: blur(6px);
+    transition: background 0.35s ease, color 0.35s ease, transform 0.35s ease;
+}
+
+.svbeat__cta:hover {
+    background: var(--gold);
+    color: #0a0a0a;
+    transform: translateY(-2px);
+}
+
+/* --- the proof list --------------------------------------------- */
+
+.svstats {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    max-width: calc(520 * var(--fx));
+}
+
+.svstat {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: calc(24 * var(--fx));
+    padding: calc(18 * var(--fx)) 0;
+    border-top: 1px solid var(--hair);
+}
+
+.svstat:last-child {
+    border-bottom: 1px solid var(--hair);
+}
+
+.svstat__value {
+    font-family: var(--font-accent);
+    font-size: calc(40 * var(--fs));
+    line-height: 1;
+    color: var(--gold-light);
+}
+
+.svstat__label {
+    font-family: var(--font-body);
+    font-size: max(calc(13 * var(--fx)), 12px);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: right;
+    color: var(--ink-dim);
+}
+
+/* --- chrome ------------------------------------------------------ */
+
+.svrail {
+    position: absolute;
+    right: calc(46 * var(--fx));
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: calc(18 * var(--fx));
+    pointer-events: none;
+}
+
+.svrail__item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: calc(12 * var(--fx));
+    font-family: var(--font-body);
+    font-size: max(calc(11 * var(--fx)), 10px);
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.28;
+}
+
+.svrail__item i {
+    width: calc(26 * var(--fx));
+    height: 1px;
+    background: var(--gold);
+}
+
+.svlab__bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.svlab__bar-fill {
+    display: block;
+    height: 100%;
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
+}
+
+.svlab__tag {
+    position: absolute;
+    left: calc(46 * var(--fx));
+    bottom: calc(34 * var(--fx));
+    z-index: 3;
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: max(calc(11 * var(--fx)), 10px);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(244, 241, 234, 0.3);
+}
+
+/* --- reduced motion: no pin, no scrub, everything readable ------- */
+
+.svlab--static .svlab__stage {
+    position: relative;
+    height: auto;
+}
+
+.svlab--static .svlab__canvas {
+    position: sticky !important;
+    top: 0;
+    height: 100vh;
+}
+
+.svlab--static .svlab__track,
+.svlab--static .svlab__grain,
+.svlab--static .svbeat__cue {
+    display: none;
+}
+
+.svlab--static .svlab__beats {
+    position: relative;
+    inset: auto;
+}
+
+.svlab--static .svbeat {
+    position: relative;
+    inset: auto;
+    min-height: 100vh;
+}
+
+/* --- phones ------------------------------------------------------ */
+
+@media (max-width: 900px) {
+    .svlab__track {
+        height: 380vh;
+    }
+
+    .svbeat {
+        padding: calc(90 * var(--fx)) calc(26 * var(--fx));
+        justify-content: flex-end;
+        padding-bottom: calc(120 * var(--fx));
+    }
+
+    .svbeat--left,
+    .svbeat--right {
+        padding-left: calc(26 * var(--fx));
+        max-width: none;
+    }
+
+    .svbeat__title {
+        font-size: calc(64 * var(--fx));
+    }
+
+    .svbeat__title--close {
+        font-size: calc(56 * var(--fx));
+    }
+
+    .svbeat__head {
+        font-size: calc(34 * var(--fx));
+        margin-bottom: calc(26 * var(--fx));
+    }
+
+    .svbeat__quote {
+        font-size: calc(30 * var(--fx));
+    }
+
+    .svbeat__sub {
+        max-width: none;
+    }
+
+    .svstats {
+        max-width: none;
+    }
+
+    .svstat {
+        padding: calc(12 * var(--fx)) 0;
+    }
+
+    .svstat__value {
+        font-size: calc(26 * var(--fx));
+    }
+
+    .svrail,
+    /* it would sit on top of the scroll cue, and the stage is small enough
+       to speak for itself */
+    .svlab__tag {
+        display: none;
+    }
+
+    /* a narrow screen has no clear side to push the mark to, so the scrim
+       runs bottom-to-top over the whole width instead of left-to-right */
+    .svbeat--left .svbeat__scrim,
+    .svbeat--right .svbeat__scrim {
+        left: 0;
+        right: 0;
+        background: linear-gradient(0deg, rgba(4, 8, 15, 0.94) 22%, rgba(4, 8, 15, 0.82) 58%, transparent 100%);
+    }
+
+    .svbeat--center .svbeat__scrim {
+        background: radial-gradient(86% 42% at 50% 62%, rgba(4, 8, 15, 0.9) 0%, rgba(4, 8, 15, 0.6) 58%, transparent 100%);
+    }
+}
